@@ -1,12 +1,13 @@
-"use client";
-
+import React from "react";
+import Jelajahi from "../../components/views/Jelajah";
 import LandingPageLayout from "@/components/layouts/LandingPageLayout";
-import Homes from "../components/views/Home";
 
-export default function Page() {
+const Jelajah = () => {
   return (
     <LandingPageLayout showNavLogo={true}>
-      <Homes />
+      <Jelajahi />
     </LandingPageLayout>
   );
-}
+};
+
+export default Jelajah;
