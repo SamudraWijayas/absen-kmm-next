@@ -10,7 +10,7 @@ const NavLogo = () => {
         width={300}
         height={300}
         alt="logo"
-        className="w-24 dark:hidden inline-block"
+        className="w-24 h-9 dark:hidden inline-block"
       />
 
       {/* Logo Dark */}
@@ -19,7 +19,7 @@ const NavLogo = () => {
         width={300}
         height={300}
         alt="logo"
-        className="w-24 hidden dark:inline-block"
+        className="w-24 h-9 hidden dark:inline-block"
       />
     </div>
   );

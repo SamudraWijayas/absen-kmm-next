@@ -8,36 +8,38 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Credentials({
       name: "credentials",
       credentials: {
-        identifier: { label: "Identifier", type: "text" },
+        identifier: { label: "identifier", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials) return null;
-
-        const identifier = credentials.identifier as string;
-        const password = credentials.password as string;
+        if (!credentials?.identifier || !credentials?.password) {
+          return null;
+        }
 
         try {
-          const result = await authServices.login({
-            identifier,
-            password,
+          const res = await authServices.login({
+            identifier: credentials.identifier as string,
+            password: credentials.password as string,
           });
 
-          if (result.status !== 200) return null;
+          if (res.status !== 200) {
+            return null;
+          }
 
-          const accessToken = result.data.data;
+          const accessToken = res.data.data;
           const me = await authServices.getProfileWithToken(accessToken);
 
-          if (me.status !== 200) return null;
-
-          const user = me.data.data;
+          if (me.status !== 200) {
+            return null;
+          }
 
           return {
-            ...user,
+            id: me.data.data.id,
+            nama: me.data.data.nama,
             accessToken,
           };
         } catch (err) {
-          console.error("Credentials login error:", err);
+          console.error("Login error:", err);
           return null;
         }
       },
@@ -47,17 +49,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
     strategy: "jwt",
   },
-
   secret: environment.AUTH_SECRET,
   trustHost: true,
-
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        // For credentials login
         token.user = user;
         token.accessToken = user.accessToken;
         token.provider = "credentials";
       }
+
       return token;
     },
 

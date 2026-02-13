@@ -1,22 +1,19 @@
 import { Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
-/* =========================
-   NEXT-AUTH AUGMENTATION
-========================= */
 declare module "next-auth" {
+  interface User {
+    id: string;
+    nama?: string;
+    accessToken?: string;
+  }
+
   interface Session {
     accessToken?: string;
     user?: {
       id: string;
       nama?: string;
     };
-  }
-
-  interface User {
-    id: string;
-    nama?: string;
-    accessToken?: string;
   }
 }
 
@@ -26,7 +23,6 @@ declare module "next-auth/jwt" {
     user?: {
       id: string;
       nama?: string;
-      accessToken?: string;
     };
   }
 }
@@ -56,14 +52,48 @@ interface JWTExtended extends JWT {
 }
 
 interface IProfile {
-  _id?: string;
+  id?: string;
   nama?: string;
-  avatar?: string | FileList;
-  username?: string;
+  tgl_lahir?: staring | DateValue;
+  jenis_kelamin?: string;
+  gol_darah?: string;
+  nama_ortu?: string;
+  hasPassword?: string;
+  mahasiswa?: boolean | string;
+  foto?: string | FileList;
+  jenjangId?: string;
+  jenjang?: {
+    id?: string;
+    name?: string;
+  };
+  kelasJenjangId?: string;
+  kelasJenjang?: {
+    id?: string;
+    name?: string;
+  };
+  kelompokId?: string;
+  kelompok?: {
+    id?: string;
+    name?: string;
+  };
+  desaId?: string;
+  desa?: {
+    id?: string;
+    name?: string;
+  };
+  daerahId?: string;
+  daerah?: {
+    id?: string;
+    name?: string;
+  };
 }
 
 interface IUpdatePassword {
   oldPassword: string;
+  password: string;
+  confirmPassword: string;
+}
+interface ISetPassword {
   password: string;
   confirmPassword: string;
 }
@@ -76,4 +106,5 @@ export type {
   UserExtended,
   IProfile,
   IUpdatePassword,
+  ISetPassword,
 };

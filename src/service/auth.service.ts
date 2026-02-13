@@ -1,6 +1,6 @@
 import instance from "@/libs/axios/instance";
 import endpoint from "./endpoint.constant";
-import { ILogin, IProfile, IUpdatePassword } from "@/types/Auth";
+import { ILogin, IProfile, ISetPassword, IUpdatePassword } from "@/types/Auth";
 
 const authServices = {
   login: (payload: ILogin) => instance.post(`${endpoint.AUTH}/login`, payload),
@@ -16,7 +16,8 @@ const authServices = {
     instance.put(`${endpoint.AUTH}/update-profile`, payload),
   updatePassword: (payload: IUpdatePassword) =>
     instance.put(`${endpoint.AUTH}/update-password`, payload),
-  // reset password
+  setPassword: (payload: ISetPassword) =>
+    instance.put(`${endpoint.AUTH}/set-password`, payload),
 };
 
 export default authServices;

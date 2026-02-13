@@ -1,11 +1,7 @@
 import authServices from "@/service/auth.service";
 import { useQuery } from "@tanstack/react-query";
 
-/**
- * Custom hook untuk mengambil profile user
- */
 const useProfile = () => {
-  // Query function untuk fetch profile
   const fetchProfile = async () => {
     const { data } = await authServices.getProfile();
     return data.data;
@@ -15,10 +11,10 @@ const useProfile = () => {
     data: dataProfile,
     isLoading,
     isError,
+    refetch: refetchProfile,
   } = useQuery({
     queryKey: ["Profile"],
     queryFn: fetchProfile,
-    // Hanya jalan di client-side
     enabled: typeof window !== "undefined",
   });
 
@@ -26,6 +22,7 @@ const useProfile = () => {
     dataProfile,
     isLoading,
     isError,
+    refetchProfile,
   };
 };
 

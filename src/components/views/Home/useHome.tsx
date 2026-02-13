@@ -1,9 +1,9 @@
-import kegiatanServices from "@/service/kegiatan.service";
+import apiServices from "@/service/api.service";
 import { useQuery } from "@tanstack/react-query";
 
 const useHome = (tanggal?: string) => {
   const getKegiatanDaerah = async () => {
-    const res = await kegiatanServices.getKegiatanDaerah(tanggal);
+    const res = await apiServices.getKegiatanDaerah(tanggal);
     const { data } = res;
     return data;
   };
@@ -19,8 +19,7 @@ const useHome = (tanggal?: string) => {
   });
   //   desa
   const getKegiatanDesa = async () => {
-    
-    const res = await kegiatanServices.getKegiatanDesa(tanggal);
+    const res = await apiServices.getKegiatanDesa(tanggal);
     const { data } = res;
     return data;
   };

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { BookOpen } from "lucide-react";
-import { Button, Divider } from "@heroui/react";
+import { Button, Divider, Skeleton, useDisclosure } from "@heroui/react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -10,8 +10,10 @@ import Link from "next/link";
 import useProfile from "@/hooks/useProfile";
 import useHome from "./useHome";
 import { IKegiatan } from "@/types/Kegiatan";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Datepicker from "@/components/ui/Datepicker/Datepicker";
+import SetPassword from "./SetPaaword/SetPassword";
+import { useSession } from "next-auth/react";
 
 const banner = [
   {
@@ -28,13 +30,14 @@ const banner = [
 
 const Homes = () => {
   const today = new Date().toISOString().split("T")[0];
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDatepicker, setShowDatepicker] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date(today));
   const formattedISODate = new Intl.DateTimeFormat("sv-SE").format(
-    selectedDate
+    selectedDate,
   );
-  const { dataProfile, isLoading, isError } = useProfile();
-
+  const { dataProfile, refetchProfile } = useProfile();
+  const setPassword = useDisclosure();
   const {
     dataKegiatanDaerah,
     isLoadingKegiatanDaerah,
@@ -43,9 +46,16 @@ const Homes = () => {
     isLoadingKegiatanDesa,
     refetchKegiatanDesa,
   } = useHome(formattedISODate);
+  const session = useSession();
+  const isLoadingSession = session.status === "loading";
+  const isAuthenticated = session.status === "authenticated";
 
   const kegiatanDaerah = dataKegiatanDaerah?.data ?? [];
   const kegiatanDesa = dataKegiatanDesa?.data ?? [];
+
+  const isLoadingKegiatan = isLoadingKegiatanDaerah || isLoadingKegiatanDesa;
+
+  const allKegiatan = [...(kegiatanDaerah ?? []), ...(kegiatanDesa ?? [])];
 
   const formattedTanggal = new Intl.DateTimeFormat("id-ID", {
     weekday: "long",
@@ -64,34 +74,67 @@ const Homes = () => {
       refetchKegiatanDaerah();
       refetchKegiatanDesa();
     }
-    setShowDatepicker(false); // tutup datepicker setelah pilih tanggal
+    setShowDatepicker(false);
   };
+
+  useEffect(() => {
+    if (dataProfile && dataProfile.hasPassword === false) {
+      setTimeout(() => {
+        setIsModalOpen(true);
+      }, 0);
+    }
+  }, [dataProfile]);
 
   return (
     <div className="w-full flex flex-col relative ">
       {/* HEADER */}
-      <header className="relative h-56 rounded-b-[2.5rem] overflow-hidden">
+      <header className="relative h-54 rounded-b-[2.5rem] overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0 bg-blue-800">
           <div className="absolute inset-0 bg-[url('/bg.png')] mix-blend-multiply bg-cover bg-top bg-no-repeat"></div>
         </div>
 
         {/* Konten di tengah */}
-        <div className="relative flex justify-start items-center gap-2 z-10 text-white pt-5 px-5">
-          <Image
-            src="/profil.jpg"
-            alt="Profile"
-            width={72}
-            height={72}
-            className="rounded-full"
-          />
-          <div>
-            <p className="text-sm opacity-90">Selamat datang,</p>
-            <h1 className="text-lg font-semibold leading-tight">
-              {dataProfile?.nama}
-            </h1>
+        {isLoadingSession ? (
+          <div className="relative flex justify-start items-center gap-2 z-10 text-white pt-5 px-5">
+            <Skeleton className="w-18 h-18 rounded-full" />
+
+            <div className="flex flex-col gap-2">
+              <Skeleton className="w-28 h-3 rounded-lg" />
+              <Skeleton className="w-36 h-5 rounded-lg" />
+            </div>
           </div>
-        </div>
+        ) : isAuthenticated ? (
+          <div className="relative flex justify-start items-center gap-2 z-10 text-white pt-5 px-5">
+            <Image
+              src={
+                dataProfile?.foto
+                  ? `${process.env.NEXT_PUBLIC_IMAGE}${dataProfile.foto}`
+                  : "/profil.jpg"
+              }
+              unoptimized
+              alt="Profile"
+              width={200}
+              height={200}
+              className="w-18 h-18 object-cover rounded-full"
+            />
+            <div>
+              <p className="text-sm opacity-90">Selamat datang,</p>
+              <Skeleton isLoaded={!!dataProfile?.nama} className="rounded-xl">
+                <h1 className="text-lg font-semibold leading-tight">
+                  {dataProfile?.nama}
+                </h1>
+              </Skeleton>
+            </div>
+          </div>
+        ) : (
+          <Link
+            href="/auth/login"
+            className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:opacity-90 transition"
+          >
+            Login
+          </Link>
+        )}
       </header>
 
       {/* Kartu SIAPkerja ID */}
@@ -128,15 +171,36 @@ const Homes = () => {
           </div>
         )}
         <div className="space-y-2">
-          {[...(kegiatanDaerah ?? []), ...(kegiatanDesa ?? [])].map(
-            (item: IKegiatan) => (
-              <div
-                key={item.id}
-                className="bg-gray-50 dark:bg-gray-600 rounded-xl p-2 text-sm font-medium flex items-center justify-between hover:bg-gray-100 transition"
-              >
-                <p className="text-gray-700 dark:text-white">{item.name}</p>
-              </div>
-            )
+          {isLoadingKegiatan && (
+            <>
+              {[1].map((i) => (
+                <Skeleton
+                  key={i}
+                  className="h-10 rounded-xl bg-gray-200 dark:bg-gray-700"
+                />
+              ))}
+            </>
+          )}
+
+          {/* DATA ADA */}
+          {!isLoadingKegiatan && allKegiatan.length > 0 && (
+            <>
+              {allKegiatan.map((item: IKegiatan) => (
+                <div
+                  key={item.id}
+                  className="bg-gray-50 dark:bg-gray-600 rounded-xl p-2 text-sm font-medium flex items-center justify-between hover:bg-gray-100 transition"
+                >
+                  <p className="text-gray-700 dark:text-white">{item.name}</p>
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* DATA KOSONG */}
+          {!isLoadingKegiatan && allKegiatan.length === 0 && (
+            <div className="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
+              Tidak ada kegiatan hari ini
+            </div>
           )}
         </div>
       </section>
@@ -224,6 +288,12 @@ const Homes = () => {
           </div>
         </div>
       </div>
+      <SetPassword
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onOpenChange={() => setIsModalOpen(!isModalOpen)} // toggle saja
+        refetch={refetchProfile}
+      />
     </div>
   );
 };

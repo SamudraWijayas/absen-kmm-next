@@ -1,5 +1,5 @@
 import { ToasterContext } from "@/contexts/ToasterContext";
-import kegiatanServices from "@/service/kegiatan.service";
+import kegiatanServices from "@/service/api.service";
 import { ApiResponse } from "@/types/api";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";

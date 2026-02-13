@@ -28,7 +28,9 @@ interface IKegiatan {
   name?: string;
   startDate?: string | DateValue;
   endDate?: string | DateValue;
-  tingkat?: string;
+  jenisKelamin?: string;
+  tingkat?: "DAERAH" | "DESA" | "KELOMPOK";
+  targetType?: "JENJANG" | "MAHASISWA" | "USIA";
   kelompokId?: string | null;
   kelompok?: {
     id?: string;
@@ -44,6 +46,25 @@ interface IKegiatan {
     id?: string;
     name?: string;
   };
+  jenjangIds?: string[];
+  minUsia?: number | null;
+  maxUsia?: number | null;
+  sasaran?: {
+    jenjang?: {
+      id?: string;
+      name?: string;
+      minUsia?: number;
+      maxUsia?: number;
+      keterangan?: string;
+    };
+  }[];
+  dokumentasi: IDokumentasi[];
+}
+
+interface IDokumentasi {
+  id: string;
+  kegiatanId: string;
+  url: string;
 }
 
 export type { IKegiatanForm, IKegiatan, Peserta, IDataKegiatan };

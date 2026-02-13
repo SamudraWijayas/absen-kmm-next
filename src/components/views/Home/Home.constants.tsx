@@ -22,7 +22,7 @@ const menuItems = [
   {
     name: "Desa",
     icon: <Home size={20} />,
-    href: "",
+    href: "/list-village",
     bg: "bg-purple-200/50 text-purple-600 dark:bg-purple-800/50 dark:text-purple-300",
   },
 ];
