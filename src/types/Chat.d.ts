@@ -20,25 +20,16 @@ interface IUser {
   updatedAt: string;
 }
 
-interface IMessage {
+interface IMessages {
   id: number;
   senderId: number;
   content: string;
   createdAt: string;
-  // bisa tambah properti lain sesuai kebutuhan
-}
-
-interface IGroup {
-  id: number;
-  name: string;
-  description: string | null;
-  createdById: number;
-  createdAt: string;
-  messages: IMessage[];
 }
 
 interface IPersonalChat {
   type: "personal";
+  conversationId: string;
   user: IUser;
   lastMessage: string | null;
   createdAt: string;
@@ -47,22 +38,24 @@ interface IPersonalChat {
 
 interface IGroupChat {
   type: "group";
-  group: IGroup;
+  conversationId: string;
+  name: string;
+  image: string | null;
   lastMessage: string | null;
   createdAt: string;
   unreadCount: number;
 }
 
-type IChat = IPersonalChat | IGroupChat;
+export type IChat = IPersonalChat | IGroupChat;
 
-export interface IMessageSender {
+interface IMessageSender {
   id: number;
   nama: string;
   slug: string;
   foto: string;
 }
 
-export interface IMessage {
+interface IMessage {
   id: number;
   senderId: number;
   receiverId: number | null;
@@ -74,7 +67,7 @@ export interface IMessage {
   reads: unknown[]; // ganti kalau sudah ada type
 }
 
-export interface IMessageResponse {
+interface IMessageResponse {
   meta: {
     status: number;
     message: string;
@@ -84,10 +77,13 @@ export interface IMessageResponse {
 
 export type {
   IChat,
+  IMessages,
   IUser,
   IGroup,
   IPersonalChat,
   IGroupChat,
   IMessageResponse,
+  IMessage,
+  IMessageSender,
   IMessage,
 };

@@ -1,12 +1,10 @@
-export const dynamic = "force-dynamic";
-
 import LandingPageLayout from "@/components/layouts/LandingPageLayout";
-import Chat from "@/components/views/Chat/Chat";
+import MessageView from "@/components/views/Chat/Message/Message";
 
 const Jelajah = () => {
   return (
     <LandingPageLayout marginTop="mt-[0px]">
-      <Chat />
+      <MessageView />
     </LandingPageLayout>
   );
 };

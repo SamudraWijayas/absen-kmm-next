@@ -1,2 +1,2 @@
-import LandingPageLayoutNavbar from "./LandingPageLayoutNavbar"
-export default LandingPageLayoutNavbar
+import BottomNav from "./BottomNav"
+export default BottomNav
