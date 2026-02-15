@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "KMM Bandar Lampung",
-  description: "Pembinaan muda-mudi difokuskan pada keterampilan hidup, kemandirian ekonomi, dan wawasan kebangsaan agar menjadi SDM unggul.",
+  description: "Pembinaan Muda-mudi difokuskan pada keterampilan hidup, kemandirian ekonomi, dan wawasan kebangsaan agar menjadi SDM unggul.",
 };
 
 export default function RootLayout({
