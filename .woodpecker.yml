@@ -3,11 +3,11 @@ steps:
     image: appleboy/drone-ssh
     settings:
       host:
-        from_secret: srv1362853.hstgr.cloud
+        from_secret: SSH_HOST
       username:
-        from_secret: root
+        from_secret: SSH_USER
       key:
-        from_secret: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDqr9EPF7CM3/Icj6067SvGeap82lwomuNMdAQ1BaSZA+79ohz2RXqJ8b370u4p4Yv3cEv2IGmUrH6bKhvns06Lk4tBzsUUYF0U2IIiHH2LgOuanFYSQTmtyRRreVVjptmt6G9Xnw79T3aqGhC1OVvjjV7K4h7QjEvLe2TltQ1S0GKm/4tn4D1zciZvs/xjjeqEFrAU87xnJh3bdDXQF9lTP2IkzEos8SUw0n8D7ZLsP3r/G/qsxxS5VQc+kNIaMybOeXkUnHE4/IiLbdBohn5OnzmO6UYlBiutLVIJIy8M2T8R28lh91mBUhbVfSKkLaTxL3sIG1IVhjqmmPpvdEkIv9C59Bgei2SOA4FyMtr02LlfYhhV9wh/WdeYW4pHlqJFmkjs5+MOFylPQ0ZF4xYC4fZY4qOcFFJ0WwgdK/XzuViSC9TxCUii5CTxRX6281f9OHcOPfrRo+RxnNQ4ZoMMmGiJ5Drf+sLnCs97NSdr3fOmCTA6n/vkuTIMSrgVbYxkZgwW6YPKl5fR6VoLKR+jrm3e4arxXouhyp6VkmSlEnKb8TB1I/mccJXoFRX71p/fXPkXRrJIX/btPtnDeNx96mCGsFqm3Wm+ra1jPrJql25E7LSuXKsIO+zgol6IE+lEM0WlNJjgcCovJ1/uod5fj34YHXckdrsHhKEV3dL/8w== kmmdaerahbdl@gmail.com
+        from_secret: SSH_KEY
       port: 22
       script:
         - cd /home/ppg
@@ -16,6 +16,5 @@ steps:
         - docker compose up -d --build
         - docker image prune -f
     when:
-      event: push
-      branch:
-        - main
+      - event: push
+        branch: main
