@@ -10,7 +10,7 @@ steps:
         from_secret: SSH_KEY
       port: 22
       script:
-        - cd /home/ppg
+        - cd /home/ppg/absen-kmm-next
         - git pull origin main
         - docker compose down
         - docker compose up -d --build
