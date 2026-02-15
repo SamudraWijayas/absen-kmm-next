@@ -32,4 +32,5 @@ services:
 
 networks:
   backend-network:
-    driver: bridge
+    external: true
+    name: backend-kmm-new_backend-network
