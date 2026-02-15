@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: frontend-app
+    container_name: m2bl-app
     restart: always
     ports:
       - "3001:3001"
