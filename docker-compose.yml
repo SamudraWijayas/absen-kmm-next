@@ -6,7 +6,7 @@ services:
     container_name: m2bl-app
     restart: always
     ports:
-      - "3001:3001"
+      - "3001:3000"
     environment:
       - NEXT_PUBLIC_API_URL=http://backend-app:5000/api/
       - NEXT_PUBLIC_IMAGE=http://backend-app:5000
