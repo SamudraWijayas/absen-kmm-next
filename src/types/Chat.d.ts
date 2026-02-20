@@ -32,6 +32,9 @@ interface IPersonalChat {
   conversationId: string;
   user: IUser;
   lastMessage: string | null;
+  lastMessageSender: {
+    id: string;
+  };
   createdAt: string;
   unreadCount: number;
 }
@@ -42,6 +45,9 @@ interface IGroupChat {
   name: string;
   image: string | null;
   lastMessage: string | null;
+  lastMessageSender: {
+    id: string;
+  };
   createdAt: string;
   unreadCount: number;
 }
@@ -56,15 +62,15 @@ interface IMessageSender {
 }
 
 interface IMessage {
-  id: number;
-  senderId: number;
-  receiverId: number | null;
-  groupId: number | null;
-  content: string;
+  id?: number;
+  senderId?: number;
+  receiverId?: number | null;
+  groupId?: number | null;
+  content?: string;
   createdAt: string;
-  sender: IMessageSender;
-  attachments: unknown[]; // ganti kalau sudah ada type
-  reads: unknown[]; // ganti kalau sudah ada type
+  sender?: IMessageSender;
+  attachments?: unknown[]; // ganti kalau sudah ada type
+  reads?: unknown[]; // ganti kalau sudah ada type
 }
 
 interface IMessageResponse {
@@ -73,6 +79,22 @@ interface IMessageResponse {
     message: string;
   };
   data: IMessage[];
+}
+
+interface ISendMessage {
+  content?: string | int;
+  conversationId?: string;
+  attachments?: string;
+}
+
+interface IGroup {
+  id?: string;
+  name?: string;
+  memberIds?: number[];
+}
+
+interface IPrivate {
+  targetUserId: number;
 }
 
 export type {
@@ -86,4 +108,6 @@ export type {
   IMessage,
   IMessageSender,
   IMessage,
+  ISendMessage,
+  IPrivate,
 };

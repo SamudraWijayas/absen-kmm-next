@@ -28,11 +28,10 @@ const Login = () => {
           {/* Header */}
           <div className="mb-6 text-center">
             <h2 className="text-3xl font-bold text-gray-900">
-              Let&apos;s Catch Big Dreams!
+              Selamat Datang Kembali
             </h2>
             <p className="mt-2 text-sm text-gray-500">
-              Pursue your dreams passionately and strive to achieve your goals
-              every day.
+              Masukkan nama dan kata sandi Anda untuk mengakses akun Anda.
             </p>
           </div>
 
@@ -50,12 +49,12 @@ const Login = () => {
               render={({ field }) => (
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Email
+                    Nama
                   </label>
                   <input
                     {...field}
                     value={field.value || ""}
-                    placeholder="Input your email"
+                    placeholder="Input your name"
                     className={cn(
                       "w-full rounded-xl border px-4 py-3 text-black text-sm focus:border-indigo-500 focus:outline-none",
                       errors.identifier ? "border-red-500" : "border-gray-300",
@@ -111,36 +110,17 @@ const Login = () => {
             <button
               type="submit"
               disabled={isPendingLogin}
-              className="mt-2 w-full rounded-xl bg-linear-to-r from-orange-400 to-orange-500 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-70"
+              className="mt-2 w-full rounded-xl bg-linear-to-r from-blue-400 to-blue-500 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-70"
             >
               {isPendingLogin ? "Loading..." : "Sign Up"}
             </button>
 
             {/* Divider */}
-            <div className="flex items-center gap-3 py-2">
-              <div className="h-px flex-1 bg-gray-200" />
-              <span className="text-xs text-gray-400">or continue with</span>
-              <div className="h-px flex-1 bg-gray-200" />
-            </div>
-
-            {/* Google */}
-            <button
-              type="button"
-              onClick={() => signIn("google", { callbackUrl: "/" })}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 py-3 text-sm font-medium"
-            >
-              <span>Google</span>
-            </button>
           </form>
 
           <p className="mt-6 text-center text-sm text-gray-600">
-            Do have an account?{" "}
-            <Link
-              href="/auth/register"
-              className="font-semibold text-indigo-600"
-            >
-              Sign
-            </Link>
+            Belum Punya Akun?{" "}
+            <span className="font-semibold text-indigo-600">Silahkan Hubungi Ketua Remajanya</span>
           </p>
         </div>
       </div>
@@ -158,11 +138,10 @@ const Login = () => {
         {/* Overlay Text */}
         <div className="absolute bottom-10 left-10 max-w-sm text-white">
           <h3 className="text-2xl font-semibold">
-            Catch Your Biggest Opportunities
+            Login Sekarang 
           </h3>
           <p className="mt-2 text-sm text-white/80">
-            Become part of our vibrant community of dedicated anglers. Adventure
-            awaits!
+            Kegiatan akan lebih mudah untuk diketahui
           </p>
         </div>
       </div>

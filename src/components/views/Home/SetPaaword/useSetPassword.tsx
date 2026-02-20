@@ -44,17 +44,19 @@ const useSetPassword = (onSuccessCallback?: () => void) => {
   } = useMutation({
     mutationFn: (payload: ISetPassword) => SetPassword(payload),
     onError: (error: AxiosError<ErrorResponse>) => {
-      const messages = error?.response?.data?.meta?.message;
+      const data = error?.response?.data?.data;
 
-      if (Array.isArray(messages)) {
+      if (data) {
+        const firstError = Object.values(data)[0]; // ambil error pertama
+
         setToaster({
           type: "error",
-          message: messages.join(", "),
+          message: firstError || "Gagal set password",
         });
       } else {
         setToaster({
           type: "error",
-          message: messages || "Gagal set password",
+          message: "Gagal set password",
         });
       }
     },

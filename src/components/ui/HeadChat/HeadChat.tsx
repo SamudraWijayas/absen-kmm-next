@@ -1,15 +1,24 @@
 "use client";
 
+import AddGroup from "@/components/views/Chat/AddGroup/AddGroup";
+import AddPrivate from "@/components/views/Chat/AddPrivate/AddPrivate";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
   Button,
+  useDisclosure,
 } from "@heroui/react";
 import { EllipsisVertical, Search } from "lucide-react";
 
-const NavBack = () => {
+interface Proptypes {
+  refetchChatList: () => void;
+}
+
+const NavBack = ({ refetchChatList }: Proptypes) => {
+  const addGroup = useDisclosure();
+  const addPrivate = useDisclosure();
   return (
     <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/70 dark:bg-black/70  dark:border-gray-700 p-4 flex flex-col gap-2 md:gap-4">
       {/* Title */}
@@ -41,11 +50,11 @@ const NavBack = () => {
             </Button>
           </DropdownTrigger>
           <DropdownMenu aria-label="Actions">
-            <DropdownItem key="new">New chat</DropdownItem>
-            <DropdownItem key="copy">Copy link</DropdownItem>
-            <DropdownItem key="edit">Edit chat</DropdownItem>
-            <DropdownItem key="delete" className="text-red-600" color="danger">
-              Delete chat
+            <DropdownItem key="new" onPress={addGroup.onOpen}>
+              Tambah Grup
+            </DropdownItem>
+            <DropdownItem key="friend" onPress={addPrivate.onOpen}>
+              Tambah Teman
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
@@ -58,6 +67,8 @@ const NavBack = () => {
         />
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
       </div>
+      <AddGroup {...addGroup} refetchChatList={refetchChatList} />
+      <AddPrivate {...addPrivate} refetchChatList={refetchChatList} />
     </div>
   );
 };

@@ -7,7 +7,9 @@ const endpoint = {
   KELOMPOK: "/kelompok-generus",
   CHAT: "/chat",
   GROUP: "/group",
-  MESSAGE: "/messages"
+  MESSAGE: "/messages",
+  CONVERSATION: "/conversations",
+  GENERUS: "/generus"
 };
 
 export default endpoint;

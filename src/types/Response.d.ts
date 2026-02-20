@@ -1,9 +1,9 @@
 interface ErrorResponse {
   meta: {
     status: number;
-    message: string | string[];
+    message: string;
   };
-  data: null;
+  data: Record<string, string>;
 }
 
 export type { ErrorResponse };

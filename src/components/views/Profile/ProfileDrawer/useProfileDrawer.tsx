@@ -8,6 +8,7 @@ const schemaUpdateProfile = yup.object().shape({
   jenis_kelamin: yup.string().required("Please select jenis kelamin"),
   gol_darah: yup.string().required("Please select golongan darah"),
   nama_ortu: yup.string().required("Please input nama orang tua"),
+  mahasiswa: yup.boolean().required("Please select status mahasiswa"),
 });
 
 const useProfileDrawer = () => {

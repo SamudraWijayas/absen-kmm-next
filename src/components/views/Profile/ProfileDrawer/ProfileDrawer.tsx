@@ -55,11 +55,15 @@ const ProfileDrawer = (props: PropTypes) => {
       setValueUpdateProfile("gol_darah", `${dataProfile?.gol_darah}`);
       setValueUpdateProfile("nama_ortu", `${dataProfile?.nama_ortu}`);
       setValueUpdateProfile(
+        "mahasiswa",
+        dataProfile?.mahasiswa === true || dataProfile?.mahasiswa === "true",
+      );
+      setValueUpdateProfile(
         "tgl_lahir",
         toInputDate(`${dataProfile?.tgl_lahir}`),
       );
     }
-  }, [dataProfile]);
+  }, [dataProfile, setValueUpdateProfile]);
   return (
     <Drawer
       isOpen={isOpen}
@@ -188,6 +192,35 @@ const ProfileDrawer = (props: PropTypes) => {
                       {["A", "B", "AB", "O", "-"].map((item) => (
                         <SelectItem key={item}>{item}</SelectItem>
                       ))}
+                    </Select>
+                  )}
+                />
+              </Skeleton>
+              <Skeleton
+                isLoaded={dataProfile?.mahasiswa !== undefined}
+                className="rounded-xl"
+              >
+                <Controller
+                  name="mahasiswa"
+                  control={controlUpdateProfile}
+                  render={({ field }) => (
+                    <Select
+                      label="Status Mahasiswa"
+                      variant="bordered"
+                      labelPlacement="outside"
+                      disallowEmptySelection
+                      selectedKeys={
+                        field.value !== undefined
+                          ? [field.value.toString()]
+                          : []
+                      }
+                      onSelectionChange={(keys) => {
+                        const value = Array.from(keys)[0];
+                        field.onChange(value === "true");
+                      }}
+                    >
+                      <SelectItem key="true">Aktif</SelectItem>
+                      <SelectItem key="false">Tidak Aktif</SelectItem>
                     </Select>
                   )}
                 />

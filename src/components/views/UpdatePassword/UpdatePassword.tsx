@@ -1,9 +1,24 @@
 "use client";
-import React from "react";
-import { Input, Button } from "@heroui/react";
-import { Lock } from "lucide-react";
+import React, { useState } from "react";
+import { Input, Button, Spinner } from "@heroui/react";
+import { Lock, Eye, EyeOff } from "lucide-react";
+import useUpdatePassword from "./useUpdatPassword";
+import { Controller } from "react-hook-form";
 
 const UpdatePassword = () => {
+  const {
+    controlUpdatePassword,
+    errorsUpdatePassword,
+    handleSubmitUpdatePassword,
+    handleUpdatePassword,
+    isPendingMutateUpdatePassword,
+  } = useUpdatePassword();
+
+  // 👇 state berbeda untuk tiap input
+  const [showOld, setShowOld] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 dark:bg-black/20 px-6">
       {/* Header */}
@@ -20,33 +35,107 @@ const UpdatePassword = () => {
       </div>
 
       {/* Form */}
-      <div className="w-full max-w-sm flex flex-col gap-5">
-        <Input
-          label="Password Lama"
-          type="password"
-          placeholder="Masukkan password lama"
-          radius="sm"
-          variant="bordered"
-        />
-        <Input
-          label="Password Baru"
-          type="password"
-          placeholder="Masukkan password baru"
-          radius="sm"
-          variant="bordered"
-        />
-        <Input
-          label="Konfirmasi Password Baru"
-          type="password"
-          placeholder="Ulangi password baru"
-          radius="sm"
-          variant="bordered"
+      <form
+        onSubmit={handleSubmitUpdatePassword(handleUpdatePassword)}
+        className="w-full max-w-sm flex flex-col gap-5"
+      >
+        {/* Password Lama */}
+        <Controller
+          name="oldPassword"
+          control={controlUpdatePassword}
+          render={({ field }) => (
+            <Input
+              {...field}
+              label="Password Lama"
+              type={showOld ? "text" : "password"}
+              placeholder="Masukkan password lama"
+              radius="sm"
+              variant="bordered"
+              labelPlacement="outside"
+              isInvalid={!!errorsUpdatePassword.oldPassword}
+              errorMessage={errorsUpdatePassword.oldPassword?.message}
+              endContent={
+                <button
+                  type="button"
+                  onClick={() => setShowOld(!showOld)}
+                  className="focus:outline-none"
+                >
+                  {showOld ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
+            />
+          )}
         />
 
-        <Button color="primary" className="mt-4 w-full">
-          Simpan Password
+        {/* Password Baru */}
+        <Controller
+          name="password"
+          control={controlUpdatePassword}
+          render={({ field }) => (
+            <Input
+              {...field}
+              label="Password Baru"
+              type={showNew ? "text" : "password"}
+              placeholder="Masukkan password baru"
+              radius="sm"
+              variant="bordered"
+              labelPlacement="outside"
+              isInvalid={!!errorsUpdatePassword.password}
+              errorMessage={errorsUpdatePassword.password?.message}
+              endContent={
+                <button
+                  type="button"
+                  onClick={() => setShowNew(!showNew)}
+                  className="focus:outline-none"
+                >
+                  {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
+            />
+          )}
+        />
+
+        {/* Konfirmasi Password */}
+        <Controller
+          name="confirmPassword"
+          control={controlUpdatePassword}
+          render={({ field }) => (
+            <Input
+              {...field}
+              label="Konfirmasi Password Baru"
+              type={showConfirm ? "text" : "password"}
+              placeholder="Ulangi password baru"
+              labelPlacement="outside"
+              radius="sm"
+              variant="bordered"
+              isInvalid={!!errorsUpdatePassword.confirmPassword}
+              errorMessage={errorsUpdatePassword.confirmPassword?.message}
+              endContent={
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className="focus:outline-none"
+                >
+                  {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
+            />
+          )}
+        />
+
+        <Button
+          type="submit"
+          color="primary"
+          className="mt-4 w-full"
+          disabled={isPendingMutateUpdatePassword}
+        >
+          {isPendingMutateUpdatePassword ? (
+            <Spinner size="sm" color="white" />
+          ) : (
+            "Update Password"
+          )}
         </Button>
-      </div>
+      </form>
     </div>
   );
 };

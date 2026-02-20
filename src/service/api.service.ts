@@ -23,6 +23,9 @@ const apiServices = {
 
   // kegiatab
   getKegiatan: () => instance.get(`${endpoint.KEGIATAN}`),
+
+  getGenerus: (params?: string) =>
+    instance.get(`${endpoint.GENERUS}-mumi?${params}`),
 };
 
 export default apiServices;

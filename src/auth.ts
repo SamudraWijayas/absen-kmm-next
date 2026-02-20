@@ -55,9 +55,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         // For credentials login
-        token.user = user;
+        token.user = {
+          id: user.id,
+          nama: user.nama,
+        };
         token.accessToken = user.accessToken;
         token.provider = "credentials";
+        token.id = user.id;
       }
 
       return token;
@@ -67,6 +71,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.accessToken = token.accessToken as string;
       session.user = {
         ...session.user,
+        id: token.user?.id ?? "", // <- ambil dari token.user.id
+        name: token.user?.nama ?? "", // kalau mau tampil nama
       };
       return session;
     },

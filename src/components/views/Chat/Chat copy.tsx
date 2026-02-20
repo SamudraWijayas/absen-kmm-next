@@ -1,101 +1,119 @@
-// "use client";
+"use client";
 
-// import HeadChat from "@/components/ui/HeadChat";
-// import Image from "next/image";
-// import { Fragment } from "react";
-// import useChat from "./useChat";
-// import { IChat } from "@/types/Chat";
-// import { Skeleton } from "@heroui/react";
+import HeadChat from "@/components/ui/HeadChat";
+import Image from "next/image";
+import { Fragment } from "react";
+import useChat from "./useChat";
+import { IChat } from "@/types/Chat";
+import { Skeleton } from "@heroui/react";
+import Link from "next/link";
 
-// const Chat = () => {
-//   const { dataChatList, isLoadingChatList } = useChat();
+const Chat = () => {
+  const { dataChatList, isLoadingChatList, onlineUsers, refetchChatList } =
+    useChat();
 
-//   const chatList: IChat[] = Array.isArray(dataChatList?.data)
-//     ? dataChatList.data
-//     : [];
+  const chatList: IChat[] = Array.isArray(dataChatList?.data)
+    ? dataChatList.data
+    : [];
 
-//   return (
-//     <Fragment>
-//       <HeadChat />
-//       <div className="px-4 lg:pt-17.5 pt-32 min-h-screen bg-white dark:bg-black/10">
-//         {/* Chat List */}
-//         <div>
-//           {isLoadingChatList
-//             ? // Skeleton placeholder 5 item
-//               Array.from({ length: 5 }).map((_, idx) => (
-//                 <div
-//                   key={idx}
-//                   className="flex justify-between items-center rounded-xl p-3 cursor-pointer"
-//                 >
-//                   <div className="flex items-center space-x-3">
-//                     <Skeleton className="w-12 h-12 rounded-full" />
-//                     <div className="flex flex-col space-y-1">
-//                       <Skeleton className="w-32 h-4 rounded-md" />
-//                       <Skeleton className="w-48 h-3 rounded-md" />
-//                     </div>
-//                   </div>
-//                   <div className="flex flex-col items-end space-y-1">
-//                     <Skeleton className="w-10 h-3 rounded-md" />
-//                     <Skeleton className="w-6 h-3 rounded-full" />
-//                   </div>
-//                 </div>
-//               ))
-//             : chatList.map((chat, idx) => {
-//                 // Ambil nama & avatar sesuai tipe
-//                 let name = "";
-//                 let avatar = "/images/illustration/illus.png"; // default
-//                 const lastMessage = chat.lastMessage || "No message yet";
-//                 const unread = chat.unreadCount || 0;
+  return (
+    <Fragment>
+      <HeadChat refetchChatList={refetchChatList} />
+      <div className="px-4 lg:pt-17.5 pt-32 min-h-screen bg-white dark:bg-black/10">
+        {/* Chat List */}
+        <div>
+          {isLoadingChatList
+            ? // Skeleton placeholder 5 item
+              Array.from({ length: 5 }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="flex justify-between items-center rounded-xl p-3 cursor-pointer"
+                >
+                  <div className="flex items-center space-x-3">
+                    <Skeleton className="w-12 h-12 rounded-full" />
+                    <div className="flex flex-col space-y-1">
+                      <Skeleton className="w-32 h-4 rounded-md" />
+                      <Skeleton className="w-48 h-3 rounded-md" />
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end space-y-1">
+                    <Skeleton className="w-10 h-3 rounded-md" />
+                    <Skeleton className="w-6 h-3 rounded-full" />
+                  </div>
+                </div>
+              ))
+            : chatList.map((chat, idx) => {
+                // Ambil nama & avatar sesuai tipe
+                let name = "";
+                let avatar = "/images/illustration/illus.png";
+                let userId: number | null = null; // untuk cek online
+                const id: string = chat.conversationId;
 
-//                 if (chat.type === "personal" && chat.user) {
-//                   name = chat.user.nama;
-//                   avatar = chat.user.foto || avatar;
-//                 } else if (chat.type === "group" && chat.group) {
-//                   name = chat.group.name;
-//                 }
+                const lastMessage = chat.lastMessage || "No message yet";
+                const unread = chat.unreadCount || 0;
 
-//                 const time = new Date(chat.createdAt).toLocaleTimeString([], {
-//                   hour: "2-digit",
-//                   minute: "2-digit",
-//                 });
+                if (chat.type === "personal") {
+                  name = chat.user.nama;
+                  avatar = chat.user.foto || avatar;
+                  userId = chat.user.id;
+                } else if (chat.type === "group") {
+                  name = chat.name;
+                  avatar = chat.image || avatar;
+                }
+                const isOnline = userId ? onlineUsers.has(userId) : false;
+                console.log("onlie", isOnline);
 
-//                 return (
-//                   <div
-//                     key={idx}
-//                     className="flex justify-between items-center rounded-xl p-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
-//                   >
-//                     <div className="flex items-center space-x-3">
-//                       <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
-//                         <Image
-//                           src={avatar}
-//                           alt={name}
-//                           width={100}
-//                           height={100}
-//                           className="w-full h-full object-cover"
-//                         />
-//                       </div>
-//                       <div className="flex flex-col">
-//                         <span className="font-medium">{name}</span>
-//                         <span className="text-gray-500 text-sm truncate">
-//                           {lastMessage}
-//                         </span>
-//                       </div>
-//                     </div>
-//                     <div className="flex flex-col items-end">
-//                       <span className="text-gray-400 text-xs">{time}</span>
-//                       {unread > 0 && (
-//                         <span className="bg-green-400 text-black text-xs font-semibold px-2 py-0.5 rounded-full mt-1">
-//                           {unread}
-//                         </span>
-//                       )}
-//                     </div>
-//                   </div>
-//                 );
-//               })}
-//         </div>
-//       </div>
-//     </Fragment>
-//   );
-// };
+                const date = new Date(chat.createdAt);
+                const time = `${date.getUTCHours().toString().padStart(2, "0")}:${date
+                  .getUTCMinutes()
+                  .toString()
+                  .padStart(2, "0")}`;
 
-// export default Chat;
+                return (
+                  <Link
+                    href={`/chat/message/${id}`}
+                    key={idx}
+                    className="flex justify-between items-center rounded-xl p-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
+                        <Image
+                          src={avatar}
+                          alt={name}
+                          width={100}
+                          height={100}
+                          className="w-full h-full object-cover"
+                        />
+                        {userId && (
+                          <span
+                            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+                              isOnline ? "bg-green-500" : "bg-gray-400"
+                            }`}
+                          />
+                        )}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{name}</span>
+                        <span className="text-gray-500 text-sm truncate">
+                          {lastMessage}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <span className="text-gray-400 text-xs">{time}</span>
+                      {unread > 0 && (
+                        <span className="bg-green-400 text-black text-xs font-semibold px-2 py-0.5 rounded-full mt-1">
+                          {unread}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
+        </div>
+      </div>
+    </Fragment>
+  );
+};
+
+export default Chat;

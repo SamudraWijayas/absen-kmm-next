@@ -2,17 +2,20 @@
 
 import { ThemeSwitcher } from "../../ThemeSwitcher/ThemeSwitcher";
 import Image from "next/image";
-import { User, Lock, Info, LogOut } from "lucide-react";
+import { User, Lock, LogOut, Download } from "lucide-react";
 import Link from "next/link";
 import useProfile from "@/hooks/useProfile";
 import { signOut, useSession } from "next-auth/react";
 import { Skeleton } from "@heroui/react";
+import PWAInstallButton from "./PWAInstallButton";
 
 const Account = () => {
   const { dataProfile } = useProfile();
   const session = useSession();
   const isLoadingSession = session.status === "loading";
   const isAuthenticated = session.status === "authenticated";
+
+  
 
   if (isLoadingSession) {
     return (
@@ -41,7 +44,6 @@ const Account = () => {
             width={200}
             height={200}
             alt="profile"
-            unoptimized
             className="w-16 h-16 object-cover rounded-full"
           />
 
@@ -78,10 +80,7 @@ const Account = () => {
               </Link>
             </>
           )}
-          <Link href="/" className="flex gap-2 items-center">
-            <Info size={20} />
-            <span className="text-sm">Pusat Bantuan</span>
-          </Link>
+          <PWAInstallButton/>
           {isAuthenticated && (
             <button
               className="flex gap-2 items-center text-red-600 cursor-pointer"

@@ -9,7 +9,7 @@ import {
   Spinner,
 } from "@heroui/react";
 import useSetPassword from "./useSetPassword";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Controller } from "react-hook-form";
 import { passwordRules } from "@/utils/passwordRules";
@@ -119,9 +119,7 @@ const SetPassword = (props: PropTypes) => {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="danger" variant="light" onPress={onClose}>
-              Close
-            </Button>
+        
             <Button
               color="primary"
               type="submit"

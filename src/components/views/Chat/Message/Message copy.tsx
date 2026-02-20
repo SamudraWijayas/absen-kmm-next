@@ -1,116 +1,344 @@
 // "use client";
 
-// import { Button, Skeleton, Input } from "@heroui/react";
-// import { IChat, IMessage } from "@/types/Chat";
+// import React, { useRef, useEffect, useMemo, Fragment } from "react";
 // import useMessage from "./useMessage";
-// import { useRef, useEffect } from "react";
+// import Image from "next/image";
+// import { Button, Skeleton } from "@heroui/react";
+// import { ChevronLeft, EllipsisVertical, SendHorizontal } from "lucide-react";
+// import { cn } from "@/utils/cn";
+// import { useRouter } from "next/navigation";
+// import { Controller } from "react-hook-form";
+// import useProfile from "@/hooks/useProfile";
+// import Emoji from "@/components/ui/Emoji/Emoji";
 
-// interface MessageViewProps {
-//   chat: IChat;
-//   onBack: () => void;
+// interface IMessage {
+//   id: number;
+//   conversationId: string;
+//   senderId: number;
+//   content: string;
+//   createdAt: string;
+//   sender: {
+//     id: number;
+//     nama: string;
+//     foto: string;
+//   };
 // }
 
-// const currentUserId = 1;
+// interface IParticipant {
+//   mumiId: number;
+//   mumi: {
+//     id: number;
+//     nama: string;
+//     foto: string;
+//   };
+// }
 
-// const MessageView: React.FC<MessageViewProps> = ({ chat, onBack }) => {
-//   const isPersonal = chat.type === "personal";
-//   const chatId = isPersonal ? String(chat.user?.id) : String(chat.group?.id);
+// interface IConversation {
+//   id: string;
+//   image: string;
+//   isGroup: boolean;
+//   name: string | null;
+//   participants: IParticipant[];
+// }
 
-//   const { dataMessage, isLoadingMessage } = useMessage(chatId, chat.type);
-//   const messages = dataMessage?.data ?? [];
+// const Message = () => {
+//   const { dataProfile } = useProfile();
+//   const currentUserId = dataProfile?.id;
+//   const router = useRouter();
+//   const inputRef = useRef<HTMLInputElement | null>(null);
 
-//   const name = isPersonal
-//     ? chat.user?.nama
-//     : (chat.group?.name ?? "Group Chat");
+//   const {
+//     dataMessage,
+//     isLoadingMessage,
+//     dataConversation,
+//     control,
+//     handleSubmitForm,
+//     handleSendMessage,
+//     markAsRead,
+//   } = useMessage();
 
-//   const bottomRef = useRef<HTMLDivElement | null>(null);
+//   const messages = useMemo(() => dataMessage?.data ?? [], [dataMessage?.data]);
 
-//   // Auto scroll ke bawah
+//   const scrollRef = useRef<HTMLDivElement>(null);
+
 //   useEffect(() => {
-//     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+//     if (currentUserId && dataMessage?.data?.length) {
+//       markAsRead(); // tandai semua message sudah dibaca
+//     }
+//   }, [currentUserId, dataMessage, markAsRead]);
+
+//   // scroll ke bawah setiap update message
+//   useEffect(() => {
+//     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
 //   }, [messages]);
 
+//   const conversation = dataConversation as IConversation | undefined;
+
+//   const otherUser = conversation?.participants.find(
+//     (p) => p.mumiId !== currentUserId,
+//   );
+
+//   const chatName = conversation?.isGroup
+//     ? (conversation.name ?? "")
+//     : (otherUser?.mumi.nama ?? "");
+
+//   const photoPath = conversation?.isGroup
+//     ? conversation.image
+//     : otherUser?.mumi.foto;
+
+//   const photoSrc =
+//     photoPath && photoPath.startsWith("http")
+//       ? photoPath
+//       : photoPath
+//         ? `${process.env.NEXT_PUBLIC_IMAGE}${photoPath}`
+//         : "/profil.jpg";
+
+//   const truncateText = (text: string, max: number) => {
+//     if (text.length <= max) return text;
+//     return text.slice(0, max) + "...";
+//   };
+
+//   const formatDateSeparator = (dateString: string) => {
+//     const date = new Date(dateString);
+
+//     return date.toLocaleDateString("id-ID", {
+//       day: "2-digit",
+//       month: "short",
+//       year: "numeric",
+//     });
+//   };
+
+//   const isDifferentDay = (current: string, previous?: string) => {
+//     if (!previous) return true;
+
+//     const currDate = new Date(current);
+//     const prevDate = new Date(previous);
+
+//     return (
+//       currDate.getFullYear() !== prevDate.getFullYear() ||
+//       currDate.getMonth() !== prevDate.getMonth() ||
+//       currDate.getDate() !== prevDate.getDate()
+//     );
+//   };
+
 //   return (
-//     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-black dark:to-gray-900 pb-24">
-//       {/* Header */}
-//       <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 shadow-sm border-b dark:border-gray-800 sticky top-0 z-20">
-//         <Button size="sm" variant="light" onClick={onBack}>
-//           ←
-//         </Button>
-//         <div>
-//           <h2 className="font-semibold text-base">{name}</h2>
-//           <p className="text-xs text-gray-400">
-//             {isPersonal ? "Personal Chat" : "Group Chat"}
-//           </p>
+//     <Fragment>
+//       <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/70 dark:bg-black/70  dark:border-gray-700 p-4 flex flex-col gap-2 md:gap-4">
+//         {/* Title */}
+//         <div className="flex items-center justify-between gap-4">
+//           <div className="flex items-center gap-3">
+//             <button
+//               onClick={() => router.back()}
+//               className="flex items-center gap-2 text-sm font-medium hover:opacity-80 transition cursor-pointer"
+//             >
+//               <ChevronLeft size={23} />
+//             </button>
+//             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200">
+//               <Image
+//                 src={photoSrc}
+//                 alt={chatName}
+//                 width={40}
+//                 height={40}
+//                 className="w-full h-full object-cover"
+//               />
+//             </div>
+
+//             <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+//               {truncateText(chatName, 18)}
+//             </h1>
+//           </div>
+
+//           {/* Dropdown Menu */}
+//           <Button
+//             isIconOnly
+//             size="sm"
+//             variant="light"
+//             className="hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+//           >
+//             <EllipsisVertical className="text-gray-700 dark:text-gray-300" />
+//           </Button>
 //         </div>
 //       </div>
+//       <div className="px-4 pt-17.5 min-h-screen bg-white dark:bg-black/10">
+//         <div>
+//           {isLoadingMessage ? (
+//             <div className="flex flex-col space-y-3 p-4 overflow-y-auto max-h-screen dark:bg-black/10">
+//               {Array.from({ length: 5 }).map((_, idx) => {
+//                 const isCurrentUser = idx % 2 === 0; // simulasi kiri/kanan
+//                 return (
+//                   <div
+//                     key={idx}
+//                     className={`flex ${isCurrentUser ? "justify-end" : "justify-start"} items-end gap-2`}
+//                   >
+//                     {!isCurrentUser && (
+//                       <div className="w-8 h-8 rounded-full bg-gray-400 animate-pulse" />
+//                     )}
 
-//       {/* Message List */}
-//       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-//         {isLoadingMessage ? (
-//           Array.from({ length: 6 }).map((_, idx) => (
-//             <Skeleton key={idx} className="w-2/3 h-12 rounded-2xl" />
-//           ))
-//         ) : messages.length === 0 ? (
-//           <p className="text-center text-gray-400 mt-10">Belum ada pesan</p>
-//         ) : (
-//           messages.map((msg: IMessage) => {
-//             const isMe = msg.senderId === currentUserId;
+//                     <div
+//                       className={cn(
+//                         "rounded-2xl p-3 max-w-[70%] animate-pulse",
+//                         isCurrentUser
+//                           ? "bg-yellow-600/70 dark:bg-yellow-700/70 rounded-br-none"
+//                           : "bg-yellow-400/70 dark:bg-yellow-500/70 rounded-bl-none",
+//                       )}
+//                     >
+//                       <div className="h-4 w-32 mb-2 rounded-md bg-yellow-500/50 dark:bg-yellow-600/50" />
+//                       <div className="h-3 w-24 rounded-md bg-yellow-500/50 dark:bg-yellow-600/50" />
+//                     </div>
 
-//             return (
-//               <div
-//                 key={msg.id}
-//                 className={`flex ${isMe ? "justify-end" : "justify-start"}`}
+//                     {isCurrentUser && (
+//                       <div className="w-8 h-8 rounded-full bg-gray-400 animate-pulse" />
+//                     )}
+//                   </div>
+//                 );
+//               })}
+//             </div>
+//           ) : (
+//             <div
+//               ref={scrollRef}
+//               className="flex flex-col space-y-3 px-4 pt-4 lg:pb-5 pb-10 overflow-y-auto lg:max-h-147 max-h-127  scrollbar-hide dark:bg-black/10"
+//             >
+//               {messages.map((msg: IMessage, index: number) => {
+//                 const previousMessage = messages[index - 1];
+//                 const showDateSeparator = isDifferentDay(
+//                   msg.createdAt,
+//                   previousMessage?.createdAt,
+//                 );
+//                 const isCurrentUser = msg.senderId === currentUserId;
+
+//                 const date = new Date(msg.createdAt);
+//                 const time = `${date.getUTCHours().toString().padStart(2, "0")}:${date
+//                   .getUTCMinutes()
+//                   .toString()
+//                   .padStart(2, "0")}`;
+
+//                 return (
+//                   <React.Fragment key={`${msg.id}-${index}`}>
+//                     {showDateSeparator && (
+//                       <div className="flex justify-center my-4">
+//                         <span className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs px-4 py-1 rounded-full">
+//                           {formatDateSeparator(msg.createdAt)}
+//                         </span>
+//                       </div>
+//                     )}
+
+//                     <div
+//                       className={`flex items-end gap-2 ${
+//                         isCurrentUser ? "justify-end" : "justify-start"
+//                       }`}
+//                     >
+//                       {/* Avatar kiri */}
+//                       {!isCurrentUser && (
+//                         <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-400">
+//                           <Image
+//                             src={
+//                               msg.sender.foto
+//                                 ? `${process.env.NEXT_PUBLIC_IMAGE}${msg.sender.foto}`
+//                                 : "/profil.jpg"
+//                             }
+//                             alt={msg.sender.nama}
+//                             width={32}
+//                             height={32}
+//                             className="w-full h-full object-cover"
+//                           />
+//                         </div>
+//                       )}
+
+//                       {/* Chat bubble */}
+//                       <div
+//                         className={cn(
+//                           "max-w-[70%] px-4 py-2 rounded-2xl shadow break-words",
+//                           isCurrentUser
+//                             ? "bg-blue-600 text-white rounded-br-none"
+//                             : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-bl-none",
+//                         )}
+//                       >
+//                         {!isCurrentUser && (
+//                           <div className="text-xs font-medium text-gray-500 mb-1">
+//                             {msg.sender.nama}
+//                           </div>
+//                         )}
+//                         <div>{msg.content}</div>
+//                         <div
+//                           className={cn(
+//                             "text-xs mt-1 text-right",
+//                             isCurrentUser ? "text-white/80" : "text-gray-400",
+//                           )}
+//                         >
+//                           {time}
+//                         </div>
+//                       </div>
+
+//                       {/* Avatar kanan */}
+//                       {isCurrentUser && (
+//                         <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-400">
+//                           <Image
+//                             src={
+//                               msg.sender.foto
+//                                 ? `${process.env.NEXT_PUBLIC_IMAGE}${msg.sender.foto}`
+//                                 : "/profil.jpg"
+//                             }
+//                             alt={msg.sender.nama}
+//                             width={32}
+//                             height={32}
+//                             className="w-full h-full object-cover"
+//                           />
+//                         </div>
+//                       )}
+//                     </div>
+//                   </React.Fragment>
+//                 );
+//               })}
+//             </div>
+//           )}
+//         </div>
+//         <div className="fixed bottom-0 left-0 w-full">
+//           <div className="max-w-2xl mx-auto">
+//             <form
+//               onSubmit={handleSubmitForm(handleSendMessage)}
+//               className="flex gap-2 px-3 py-2"
+//             >
+//               <Controller
+//                 name="content"
+//                 control={control}
+//                 render={({ field }) => (
+//                   <div className="w-full flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-900 rounded-full">
+//                     <div className="flex items-center justify-center">
+//                       <Emoji
+//                         value={field.value}
+//                         onChange={field.onChange}
+//                         inputRef={inputRef}
+//                       />
+//                     </div>
+
+//                     <input
+//                       {...field}
+//                       ref={(e) => {
+//                         field.ref(e);
+//                         inputRef.current = e;
+//                       }}
+//                       placeholder="Ketik pesan"
+//                       className="flex-1 bg-transparent outline-none text-sm"
+//                     />
+//                   </div>
+//                 )}
+//               />
+
+//               <Button
+//                 isIconOnly
+//                 type="submit"
+//                 radius="full"
+//                 color="primary"
+//                 className="w-10 h-10 min-w-0"
 //               >
-//                 <div
-//                   className={`
-//                     max-w-[75%] px-4 py-2 rounded-2xl text-sm shadow-md
-//                     ${
-//                       isMe
-//                         ? "bg-emerald-500 text-white rounded-br-sm"
-//                         : "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-bl-sm"
-//                     }
-//                   `}
-//                 >
-//                   {!isPersonal && !isMe && (
-//                     <p className="text-xs font-semibold mb-1 text-blue-500">
-//                       {msg.sender?.nama}
-//                     </p>
-//                   )}
-
-//                   <p className="leading-relaxed">{msg.content}</p>
-
-//                   <p className="text-[10px] text-right mt-1 opacity-70">
-//                     {new Date(msg.createdAt).toLocaleTimeString([], {
-//                       hour: "2-digit",
-//                       minute: "2-digit",
-//                     })}
-//                   </p>
-//                 </div>
-//               </div>
-//             );
-//           })
-//         )}
-//         <div ref={bottomRef} />
-//       </div>
-
-//       {/* Input Area */}
-//       <div className="fixed bottom-16 left-0 w-full">
-//         <div className="max-w-2xl mx-auto px-4">
-//           <div className="flex gap-2 bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-full shadow-md px-3 py-2">
-//             <Input
-//               placeholder="Ketik pesan..."
-//               className="flex-1"
-//               radius="full"
-//             />
-//             <Button radius="full" color="primary">
-//               Kirim
-//             </Button>
+//                 <SendHorizontal size={18} />
+//               </Button>
+//             </form>
 //           </div>
 //         </div>
 //       </div>
-//     </div>
+//     </Fragment>
 //   );
 // };
 
-// export default MessageView;
+// export default Message;

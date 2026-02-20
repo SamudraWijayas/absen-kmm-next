@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { BookOpen } from "lucide-react";
-import { Button, Divider, Skeleton, useDisclosure } from "@heroui/react";
+import { Button, Divider, Skeleton } from "@heroui/react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -18,13 +18,13 @@ import { useSession } from "next-auth/react";
 const banner = [
   {
     id: "1",
-    title: "sadasd",
-    image: "/bg.png",
+    title: "M2BL",
+    image: "/images/pengurus/m2bl.jpg",
   },
   {
     id: "2",
-    title: "sadasd",
-    image: "/profil.jpg",
+    title: "Keputrian",
+    image: "/images/pengurus/kp.jpg",
   },
 ];
 
@@ -37,7 +37,6 @@ const Homes = () => {
     selectedDate,
   );
   const { dataProfile, refetchProfile } = useProfile();
-  const setPassword = useDisclosure();
   const {
     dataKegiatanDaerah,
     isLoadingKegiatanDaerah,
@@ -277,11 +276,19 @@ const Homes = () => {
                 <SwiperSlide key={banner.id}>
                   <Image
                     src={banner.image}
-                    alt={`${banner.title}`}
-                    className="h-full w-full rounded-none lg:rounded-2xl object-cover"
-                    width={1920}
-                    height={800}
+                    alt={banner.title}
+                    fill
+                    className="object-cover object-center rounded-none lg:rounded-2xl"
+                    sizes="100vw"
+                    priority
                   />
+                  {/* <Image
+                      src={banner.image}
+                      alt={`${banner.title}`}
+                      className="h-full w-full rounded-none lg:rounded-2xl object-cover"
+                      width={1920}
+                      height={800}
+                    /> */}
                 </SwiperSlide>
               ))}
             </Swiper>

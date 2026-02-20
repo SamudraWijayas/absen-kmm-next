@@ -40,9 +40,8 @@ const useLogin = () => {
       redirect: false,
       callbackUrl,
     });
-    console.log("Hasil dari signIn:", result);
-    if (result?.error && result?.status === 401) {
-      throw new Error("Login Failed" + result.error);
+    if (!result || result.error) {
+      throw new Error(result?.error || "Login failed");
     }
     return result;
   };
@@ -50,10 +49,9 @@ const useLogin = () => {
   const { mutate: mutateLogin, isPending: isPendingLogin } = useMutation({
     mutationFn: loginService,
     onError: () => {
-      console.log("Login error - setting toaster");
-      setToaster({
+        setToaster({
         type: "error",
-        message: "Your credential is wrong",
+        message: "Username atau password salah",
       });
     },
     onSuccess: () => {
