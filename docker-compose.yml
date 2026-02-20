@@ -8,10 +8,10 @@ services:
     ports:
       - "3001:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend-app:5000/api/
-      - NEXT_PUBLIC_IMAGE=http://backend-app:5000
+      - NEXT_PUBLIC_API_URL=https://api.ppgbdl.com/api
+      - NEXT_PUBLIC_IMAGE=https://api.ppgbdl.com
       - NEXTAUTH_SECRET=I44s8c044eZOnOFYRgkpONfxgbEtu5iuObu0h4JzlmA=
-      - NEXTAUTH_URL=http://76.13.187.228:3001
+      - NEXTAUTH_URL=https://kmm.ppgbdl.com
       - NODE_ENV=production
     healthcheck:
       test:
