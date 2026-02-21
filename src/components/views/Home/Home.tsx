@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import Datepicker from "@/components/ui/Datepicker/Datepicker";
 import SetPassword from "./SetPaaword/SetPassword";
 import { useSession } from "next-auth/react";
+import LandingPageFooter from "@/components/layouts/LandingPageLayout/LandingPageFooter";
 
 const banner = [
   {
@@ -147,7 +148,7 @@ const Homes = () => {
               <span className="font-semibold text-md">{formattedTanggal}</span>
             </div>
           </div>
-          <div className="mx-4 mt-4 z-99 flex items-center gap-2">
+          <div className="z-99 flex items-center gap-2">
             <Button
               variant="flat"
               color="primary"
@@ -208,7 +209,7 @@ const Homes = () => {
           <div className="w-80">
             <div className="flex items-center gap-2 text-xs opacity-90 mb-1">
               <BookOpen size={14} />
-              <span>KMM Link</span>
+              <span>Generusbdl</span>
             </div>
             <h2 className="text-sm font-semibold leading-tight">
               Mengaji bukan sekedar datang tapi juga memahami dan mengamalkan
@@ -229,14 +230,14 @@ const Homes = () => {
       <div className="mt-4 px-4">
         <div className="bg-white dark:bg-gray-900 rounded-2xl space-y-5 p-4">
           <div className="leading-tight space-y-1">
-            <h1 className="text-lg font-semibold">KMM Activity</h1>
+            <h1 className="text-lg font-semibold">Generus Activity</h1>
             <p className="text-[12px] text-gray-500">
               Gunakan menu ini untuk melihat aktivitas yang sedang berlangsung
-              di Desa dan Daerah Anda
+              di Daerah, Desa dan Kelompok Anda
             </p>
           </div>
 
-          <nav className="grid grid-cols-4 gap-2 px-4 text-center text-sm">
+          <nav className="grid grid-cols-4 gap-2  text-center text-sm">
             {menuItems.map((item) => (
               <Link key={item.name} href={item.href}>
                 <div className="flex flex-col items-center">
@@ -278,7 +279,7 @@ const Homes = () => {
                     src={banner.image}
                     alt={banner.title}
                     fill
-                    className="object-cover object-center rounded-none lg:rounded-2xl"
+                    className="object-cover object-center rounded-2xl"
                     sizes="100vw"
                     priority
                   />
@@ -294,6 +295,9 @@ const Homes = () => {
             </Swiper>
           </div>
         </div>
+        {/* <div className="pb-10">
+          <LandingPageFooter />
+        </div> */}
       </div>
       <SetPassword
         isOpen={isModalOpen}

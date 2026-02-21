@@ -26,7 +26,7 @@ const LandingPage = () => {
         <div className="flex gap-4">
           <Link
             href="auth/login"
-            className="text-sm px-4 py-2 rounded-lg border border-gray-300"
+            className="text-sm px-4 py-2 rounded-lg border text-black border-gray-300"
           >
             Log in
           </Link>

@@ -6,11 +6,15 @@ import {
   DrawerFooter,
   Button,
   Checkbox,
+  Input,
+  Pagination,
 } from "@heroui/react";
 import useAddGroup from "./useAddPrivate";
 import { useEffect } from "react";
 import { IGenerus } from "@/types/Generus";
 import { Controller } from "react-hook-form";
+import useFilter from "@/hooks/useFilter";
+import { Search } from "lucide-react";
 
 interface PropTypes {
   isOpen: boolean;
@@ -21,6 +25,15 @@ interface PropTypes {
 
 const AddGroup = (props: PropTypes) => {
   const { isOpen, onClose, onOpenChange, refetchChatList } = props;
+
+  const {
+    limit,
+    page,
+    search,
+    handleChangePage,
+    handleSearch,
+    handleClearSearch,
+  } = useFilter();
 
   const {
     dataGenerus,
@@ -35,9 +48,11 @@ const AddGroup = (props: PropTypes) => {
     isPendingMutateAddPrivate,
     isSuccessMutateAddPrivate,
     handleAddPrivate,
-  } = useAddGroup();
+  } = useAddGroup({ limit, page, search });
 
   const mumiList = dataGenerus?.data ?? [];
+  const totalPages = dataGenerus?.pagination.totalPages || 0;
+
 
   useEffect(() => {
     if (isSuccessMutateAddPrivate) {
@@ -51,9 +66,17 @@ const AddGroup = (props: PropTypes) => {
       <form onSubmit={handleSubmitForm(handleAddPrivate)}>
         <DrawerContent>
           <DrawerHeader className="flex flex-col gap-1">
-            Tambah Grup
+            Tambah Teman Ngobrol
           </DrawerHeader>
           <DrawerBody>
+            <Input
+              isClearable
+              className="w-full"
+              placeholder="Cari berdasarkan nama"
+              startContent={<Search />}
+              onClear={handleClearSearch}
+              onChange={handleSearch}
+            />
             {isLoadingGenerus ? (
               <p>Loading...</p>
             ) : mumiList.length === 0 ? (
@@ -90,13 +113,26 @@ const AddGroup = (props: PropTypes) => {
                 })}
               </div>
             )}
+            <div>
+              {totalPages > 1 && (
+                <Pagination
+                  isCompact
+                  showControls
+                  color="primary"
+                  page={Number(page)}
+                  total={totalPages}
+                  onChange={handleChangePage}
+                  loop
+                />
+              )}
+            </div>
           </DrawerBody>
           <DrawerFooter>
             <Button color="danger" variant="light" onPress={onClose}>
               Close
             </Button>
             <Button type="submit" color="primary" onPress={onClose}>
-              Action
+              Tambah Teman
             </Button>
           </DrawerFooter>
         </DrawerContent>

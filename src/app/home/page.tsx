@@ -5,7 +5,7 @@ import Homes from "@/components/views/Home";
 
 export default function Page() {
   return (
-    <LandingPageLayout showNavLogo={true}>
+    <LandingPageLayout showNavLogo={true} showFooter={false}>
       <Homes />
     </LandingPageLayout>
   );

@@ -55,7 +55,7 @@ const Emoji = ({ value, onChange, inputRef }: EmojiProps) => {
         onClick={() => setShowEmoji(!showEmoji)}
         className="text-gray-500 hover:text-primary"
       >
-        <Smile size={22} />
+        <Smile size={25} />
       </button>
     </div>
   );

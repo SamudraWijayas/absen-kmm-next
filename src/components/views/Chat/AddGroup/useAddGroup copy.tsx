@@ -7,42 +7,49 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
+import useDebounce from "@/hooks/useDebounce";
 
 const schema = yup.object().shape({
-  name: yup.string().required("Amal Sholeh input dulu nama grup"),
+  name: yup.string().required("Please input name"),
 });
 
-interface UseAddGroupProps {
-  limit: number;
-  page: number;
-  search: string;
-}
-
-const useAddGroup = ({ limit, page, search }: UseAddGroupProps) => {
+const useAddGroup = () => {
   const { setToaster } = useContext(ToasterContext);
+
+  // ================= STATE =================
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  /* ================= GET DATA ================= */
+  // untuk input value instan
+  const [searchInput, setSearchInput] = useState("");
+
+  // untuk query ke backend (pakai debounce)
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const debounce = useDebounce();
+  const LIMIT = 10;
+  const PAGE = 1;
+
+  // ================= GET DATA =================
   const getGenerus = async () => {
-    let params = `limit=${limit}&page=${page}`;
-    if (search) {
-      params += `&search=${search}`;
-    }
+    let params = `limit=${LIMIT}&page=${PAGE}`;
+    if (searchQuery) params += `&search=${searchQuery}`;
     const res = await apiServices.getGenerus(params);
     return res.data;
   };
 
   const { data: dataGenerus, isLoading: isLoadingGenerus } = useQuery({
-    queryKey: ["Generus", limit, page, search],
+    queryKey: ["Generus", searchQuery], // refetch otomatis saat searchQuery berubah
     queryFn: getGenerus,
   });
 
+  // ================= SELECT HANDLER =================
   const toggleSelect = (id: number) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
   };
 
+  // ================= FORM HANDLER =================
   const {
     control,
     handleSubmit: handleSubmitForm,
@@ -65,27 +72,29 @@ const useAddGroup = ({ limit, page, search }: UseAddGroupProps) => {
   } = useMutation({
     mutationFn: addGroup,
     onError: (error) => {
-      setToaster({
-        type: "error",
-        message: error.message,
-      });
+      setToaster({ type: "error", message: error.message });
     },
     onSuccess: () => {
-      setToaster({
-        type: "success",
-        message: "Berhasil Tambah Grup",
-      });
+      setToaster({ type: "success", message: "Berhasil Tambah Grup" });
       reset();
+      setSelectedIds([]);
     },
   });
 
   const handleAddGroup = (data: IGroup) => {
-    const payload = {
-      ...data,
-      memberIds: selectedIds,
-    };
-
+    const payload = { ...data, memberIds: selectedIds };
     mutateAddGroup(payload);
+  };
+
+  // ================= SEARCH HANDLER =================
+  const handleSearch = (value: string) => {
+    setSearchInput(value); // langsung update input → huruf muncul instan
+    debounce(() => setSearchQuery(value), 300); // update query ke backend dengan delay
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput("");
+    setSearchQuery("");
   };
 
   return {
@@ -101,6 +110,10 @@ const useAddGroup = ({ limit, page, search }: UseAddGroupProps) => {
     isPendingMutateAddGroup,
     isSuccessMutateAddGroup,
     handleAddGroup,
+
+    searchInput,
+    handleSearch,
+    handleClearSearch,
   };
 };
 

@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import { Button, Divider, useDisclosure } from "@heroui/react";
 import ProfileDrawer from "./ProfileDrawer";
 import useProfile from "./useProfile";
 import { Camera, Check, X } from "lucide-react";
 import { Controller } from "react-hook-form";
+
+// Crop library
 import Cropper, { Area } from "react-easy-crop";
-import getCroppedImg from "@/utils/cropImage";
+import getCroppedImg from "@/utils/cropImage"; // helper buat crop canvas → blob
 
 const Profile = () => {
   const {
@@ -17,22 +19,19 @@ const Profile = () => {
     isPendingMutateUpdateProfile,
     isSuccessMutateUpdateProfile,
     refetchProfile,
-
     handleDeletePicture,
     handleUploadPicture,
     isPendingMutateUploadFile,
-
     controlUpdatePicture,
     handleSubmitUpdatePicture,
     resetUpdatePicture,
-
-    preview,
   } = useProfile();
 
   const UpdateProfile = useDisclosure();
 
   const inputFileRef = useRef<HTMLInputElement | null>(null);
 
+  // State untuk crop
   const [imageSrc, setImageSrc] = useState<string | null>(null); // file preview
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -91,6 +90,7 @@ const Profile = () => {
       refetchProfile();
     }
   }, [isSuccessMutateUpdateProfile, refetchProfile, resetUpdatePicture]);
+
   return (
     <div className="px-4 pt-17.5 min-h-screen bg-white dark:bg-black/10">
       <div className="flex flex-col gap-4 items-center">
@@ -98,8 +98,8 @@ const Profile = () => {
           {/* Avatar */}
           <Image
             src={
-              preview
-                ? preview
+              imageSrc
+                ? imageSrc
                 : dataProfile?.foto
                   ? `${process.env.NEXT_PUBLIC_IMAGE}${dataProfile.foto}`
                   : "/profil.jpg"
@@ -112,12 +112,13 @@ const Profile = () => {
             className="w-30 h-30 rounded-full object-cover border-4 border-white shadow-md cursor-pointer transition"
           />
 
-          {/* Icon Kamera (default) */}
-          {!preview && (
+          {/* Camera Icon */}
+          {!imageSrc && !dataProfile?.foto && (
             <div className="absolute bottom-1 right-1 w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md pointer-events-none z-10">
               <Camera size={14} />
             </div>
           )}
+
           <Controller
             name="foto"
             control={controlUpdatePicture}
@@ -133,7 +134,7 @@ const Profile = () => {
                 />
 
                 {/* Delete */}
-                {preview && (
+                {!imageSrc && dataProfile?.foto && (
                   <button
                     type="button"
                     onClick={() => {
@@ -148,22 +149,31 @@ const Profile = () => {
                   </button>
                 )}
 
-                {/* Save */}
-                {preview && (
-                  <button
-                    type="button"
-                    onClick={handleSubmitUpdatePicture(handleUpdateProfile)}
-                    className="absolute -bottom-2 -right-2 w-7 h-7 flex items-center justify-center rounded-full bg-blue-500 text-white shadow-md hover:bg-blue-700 transition-all"
-                  >
-                    <Check size={14} />
-                  </button>
+                {/* Save crop */}
+                {imageSrc && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleSaveCropped}
+                      className="absolute -bottom-2 -right-2 w-7 h-7 flex items-center justify-center rounded-full bg-blue-500 text-white shadow-md hover:bg-blue-700 transition-all"
+                    >
+                      <Check size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelCrop}
+                      className="absolute -bottom-2 -left-2 w-7 h-7 flex items-center justify-center rounded-full bg-gray-500 text-white shadow-md hover:bg-gray-700 transition-all"
+                    >
+                      <X size={14} />
+                    </button>
+                  </>
                 )}
               </>
             )}
           />
 
-          {/* Hover Overlay */}
-          {!preview && (
+          {/* Hover overlay */}
+          {!imageSrc && (
             <div
               className="absolute inset-0 rounded-full flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 cursor-pointer transition"
               onClick={triggerFileSelect}
@@ -181,6 +191,8 @@ const Profile = () => {
             </div>
           )}
 
+          {/* Cropper Overlay */}
+          {/* Cropper Overlay */}
           {imageSrc && (
             <div className="fixed inset-0 z-50 bg-black/70 flex flex-col items-center justify-center p-4">
               <div className="relative w-72 h-72 rounded-full overflow-hidden bg-gray-800">
@@ -196,21 +208,21 @@ const Profile = () => {
                   onCropComplete={onCropComplete}
                 />
 
-                {/* Buttons positioned below the crop circle */}
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4">
+                {/* Buttons inside overlay */}
+                <div className="absolute bottom-2 left-2 flex gap-2">
                   <button
                     type="button"
                     onClick={handleCancelCrop}
-                    className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-500 text-white shadow-md hover:bg-gray-700 transition-all"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-500 text-white shadow-md hover:bg-gray-700 transition-all"
                   >
-                    <X size={18} />
+                    <X size={16} />
                   </button>
                   <button
                     type="button"
                     onClick={handleSaveCropped}
-                    className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 text-white shadow-md hover:bg-blue-700 transition-all"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-500 text-white shadow-md hover:bg-blue-700 transition-all"
                   >
-                    <Check size={18} />
+                    <Check size={16} />
                   </button>
                 </div>
               </div>
@@ -225,6 +237,7 @@ const Profile = () => {
           </span>
         </div>
       </div>
+
       <div className="pt-10">
         <div className="flex flex-col gap-0">
           <span className="text-gray-600 dark:text-gray-400">Kelompok</span>
@@ -238,7 +251,6 @@ const Profile = () => {
             Jenis Kelamin
           </span>
           <span className="dark:text-white text-black">
-            {" "}
             {dataProfile?.jenis_kelamin}
           </span>
         </div>

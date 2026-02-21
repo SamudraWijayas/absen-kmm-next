@@ -15,7 +15,16 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Generus Bandar Lampung",
-  description: "Pembinaan Muda-mudi difokuskan pada karakter, keterampilan hidup, kemandirian ekonomi, dan wawasan kebangsaan agar menjadi SDM unggul.",
+  description:
+    "Pembinaan Muda-mudi difokuskan pada karakter, keterampilan hidup, kemandirian ekonomi, dan wawasan kebangsaan agar menjadi SDM unggul.",
+  themeColor: "#000000",
+  manifest: "/manifest.json",
+
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Generusbdl",
+  },
 };
 
 export default function RootLayout({

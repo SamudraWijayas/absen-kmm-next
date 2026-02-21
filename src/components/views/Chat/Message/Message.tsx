@@ -54,7 +54,6 @@ interface IConversation {
   participants: IParticipant[];
 }
 
-
 const Message = ({ initialTheme }: Props) => {
   const { dataProfile } = useProfile();
   const currentUserId = dataProfile?.id;
@@ -190,7 +189,7 @@ const Message = ({ initialTheme }: Props) => {
       >
         <div>
           {isLoadingMessage ? (
-            <div className="flex flex-col space-y-3 p-4 overflow-y-auto max-h-screen dark:bg-black/10">
+            <div className="flex flex-col space-y-3 py-4 overflow-y-auto max-h-screen">
               {Array.from({ length: 5 }).map((_, idx) => {
                 const isCurrentUser = idx % 2 === 0; // simulasi kiri/kanan
                 return (
@@ -206,12 +205,12 @@ const Message = ({ initialTheme }: Props) => {
                       className={cn(
                         "rounded-2xl p-3 max-w-[70%] animate-pulse",
                         isCurrentUser
-                          ? "bg-yellow-600/70 dark:bg-yellow-700/70 rounded-br-none"
-                          : "bg-yellow-400/70 dark:bg-yellow-500/70 rounded-bl-none",
+                          ? "bg-blue-600/70 dark:bg-blue-700/70 rounded-br-none"
+                          : "bg-blue-400/70 dark:bg-blue-500/70 rounded-bl-none",
                       )}
                     >
-                      <div className="h-4 w-32 mb-2 rounded-md bg-yellow-500/50 dark:bg-yellow-600/50" />
-                      <div className="h-3 w-24 rounded-md bg-yellow-500/50 dark:bg-yellow-600/50" />
+                      <div className="h-4 w-32 mb-2 rounded-md bg-blue-500/50 dark:bg-blue-600/50" />
+                      <div className="h-3 w-24 rounded-md bg-blue-500/50 dark:bg-blue-600/50" />
                     </div>
 
                     {isCurrentUser && (
@@ -224,7 +223,7 @@ const Message = ({ initialTheme }: Props) => {
           ) : (
             <div
               ref={scrollRef}
-              className="flex flex-col space-y-3 px-4 pt-4 lg:pb-5 pb-10 overflow-y-auto lg:max-h-147 max-h-127  scrollbar-hide dark:bg-black/10"
+              className="flex flex-col space-y-3 pt-4 lg:pb-15 pb-15 overflow-y-auto h-[calc(100vh-5rem)] scrollbar-hide "
             >
               {messages.map((msg: IMessage, index: number) => {
                 const previousMessage = messages[index - 1];
@@ -352,9 +351,14 @@ const Message = ({ initialTheme }: Props) => {
                 name="content"
                 control={control}
                 render={({ field }) => (
-                  <div className={cn("w-full flex items-center gap-2 px-3 py-2 dark:bg-gray-900 rounded-full", currentTheme.colorInput)}>
+                  <div
+                    className={cn(
+                      "flex items-center px-1 rounded-full h-12 flex-1 dark:bg-gray-900",
+                      currentTheme.colorInput,
+                    )}
+                  >
                     {/* Emoji button */}
-                    <div className="flex items-center justify-center h-6 w-6">
+                    <div className="flex items-center justify-center h-12 w-12">
                       <Emoji
                         value={field.value}
                         onChange={field.onChange}
@@ -370,20 +374,21 @@ const Message = ({ initialTheme }: Props) => {
                         inputRef.current = e;
                       }}
                       placeholder="Ketik pesan"
-                      className="flex-1 bg-transparent outline-none text-sm h-6"
+                      className="flex-1 bg-transparent outline-none text-sm h-full"
                     />
                   </div>
                 )}
               />
 
+              {/* Submit button */}
               <button
                 type="submit"
                 className={cn(
-                  "w-10 h-10 min-w-10 min-h-10 flex items-center justify-center rounded-full shrink-0",
+                  "flex items-center justify-center rounded-full h-12 w-12 shrink-0",
                   currentTheme.color,
                 )}
               >
-                <SendHorizontal size={18} />
+                <SendHorizontal size={20} />
               </button>
             </form>
           </div>

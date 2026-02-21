@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button, Divider, useDisclosure } from "@heroui/react";
 import ProfileDrawer from "./ProfileDrawer";
 import useProfile from "./useProfile";
 import { Camera, Check, X } from "lucide-react";
 import { Controller } from "react-hook-form";
-import Cropper, { Area } from "react-easy-crop";
-import getCroppedImg from "@/utils/cropImage";
 
 const Profile = () => {
   const {
@@ -33,11 +31,6 @@ const Profile = () => {
 
   const inputFileRef = useRef<HTMLInputElement | null>(null);
 
-  const [imageSrc, setImageSrc] = useState<string | null>(null); // file preview
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-
   const triggerFileSelect = () => {
     inputFileRef.current?.click();
   };
@@ -46,43 +39,9 @@ const Profile = () => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    const file = files[0];
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      setImageSrc(reader.result as string); // tampilkan cropper
+    handleUploadPicture(files, () => {
+      refetchProfile();
     });
-    reader.readAsDataURL(file);
-  };
-
-  const onCropComplete = useCallback(
-    (croppedArea: Area, croppedAreaPixels: Area) => {
-      setCroppedAreaPixels(croppedAreaPixels);
-    },
-    [],
-  );
-
-  const handleSaveCropped = async () => {
-    if (!imageSrc || !croppedAreaPixels) return;
-
-    try {
-      const blob = await getCroppedImg(imageSrc, croppedAreaPixels);
-      const file = new File([blob], "avatar.png", { type: "image/png" });
-
-      // Convert File to FileList
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-
-      handleUploadPicture(dataTransfer.files, () => {
-        setImageSrc(null);
-        refetchProfile();
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleCancelCrop = () => {
-    setImageSrc(null);
   };
 
   useEffect(() => {
@@ -178,42 +137,6 @@ const Profile = () => {
           {isPendingMutateUploadFile && (
             <div className="absolute bottom-0 right-0 bg-white text-xs px-2 py-1 rounded shadow">
               Uploading...
-            </div>
-          )}
-
-          {imageSrc && (
-            <div className="fixed inset-0 z-50 bg-black/70 flex flex-col items-center justify-center p-4">
-              <div className="relative w-72 h-72 rounded-full overflow-hidden bg-gray-800">
-                <Cropper
-                  image={imageSrc}
-                  crop={crop}
-                  zoom={zoom}
-                  aspect={1}
-                  cropShape="round"
-                  showGrid={false}
-                  onCropChange={setCrop}
-                  onZoomChange={setZoom}
-                  onCropComplete={onCropComplete}
-                />
-
-                {/* Buttons positioned below the crop circle */}
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4">
-                  <button
-                    type="button"
-                    onClick={handleCancelCrop}
-                    className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-500 text-white shadow-md hover:bg-gray-700 transition-all"
-                  >
-                    <X size={18} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSaveCropped}
-                    className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 text-white shadow-md hover:bg-blue-700 transition-all"
-                  >
-                    <Check size={18} />
-                  </button>
-                </div>
-              </div>
             </div>
           )}
         </div>

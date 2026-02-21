@@ -66,7 +66,6 @@ const ChatItem = (props: Proptypes) => {
     .getUTCMinutes()
     .toString()
     .padStart(2, "0")}`;
-
   return (
     <div className="relative overflow-hidden rounded-xl mb-2">
       {/* DELETE BUTTON (di belakang) */}
@@ -117,46 +116,46 @@ const ChatItem = (props: Proptypes) => {
           href={`/chat/message/${id}`}
           draggable={false}
           onClick={(e) => {
-            if (isDragging) e.preventDefault();
+            if (isDragging) {
+              e.preventDefault();
+            }
           }}
           className="flex justify-between items-center p-3 hover:bg-gray-100 rounded-xl dark:hover:bg-gray-800"
         >
           <div className="flex items-center space-x-3">
-            {/* Avatar + Online Indicator */}
-            <div className="relative w-12 h-12 flex-shrink-0">
-              <div className="w-full h-full rounded-full overflow-hidden bg-gray-200 flex items-center justify-center text-white font-bold text-lg">
-                {chat.type === "group" ? (
-                  chat.image ? (
-                    <Image
-                      src={chat.image}
-                      alt={name}
-                      width={100}
-                      height={100}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <Avatar
-                      src={undefined}
-                      name={name}
-                      showFallback
-                      className="w-12 h-12 bg-blue-100 text-blue-500 text-xl font-bold md:text-2xl"
-                    />
-                  )
-                ) : (
+            <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center text-white font-bold text-lg">
+              {chat.type === "group" ? (
+                chat.image ? (
                   <Image
-                    src={avatar}
+                    src={chat.image}
                     alt={name}
                     width={100}
                     height={100}
                     className="w-full h-full object-cover"
                   />
-                )}
-              </div>
+                ) : (
+                  // fallback: inisial nama grup
+                  <Avatar
+                    src={undefined} // karena tidak ada image
+                    name={name} // nama grup untuk inisial
+                    showFallback
+                    className="w-12 h-12 bg-blue-100 text-blue-500 text-xl font-bold md:text-2xl"
+                  />
+                )
+              ) : (
+                <Image
+                  src={avatar}
+                  alt={name}
+                  width={100}
+                  height={100}
+                  className="w-full h-full object-cover"
+                />
+              )}
 
-              {/* Online indicator di luar overflow-hidden */}
+              {/* Online indicator */}
               {userId && (
                 <span
-                  className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${
+                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
                     isOnline ? "bg-green-500" : "bg-gray-400"
                   }`}
                 />

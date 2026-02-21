@@ -13,19 +13,28 @@ const schema = yup.object().shape({
   targetUserId: yup.number().required("Please input name"),
 });
 
-const useAddPrivate = () => {
+interface UseAddGroupProps {
+  limit: number;
+  page: number;
+  search: string;
+}
+
+const useAddPrivate = ({ limit, page, search }: UseAddGroupProps) => {
   const { setToaster } = useContext(ToasterContext);
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   /* ================= GET DATA ================= */
   const getGenerus = async () => {
-    const params = `limit=999`;
+    let params = `limit=${limit}&page=${page}`;
+    if (search) {
+      params += `&search=${search}`;
+    }
     const res = await apiServices.getGenerus(params);
     return res.data;
   };
 
   const { data: dataGenerus, isLoading: isLoadingGenerus } = useQuery({
-    queryKey: ["Generus"],
+    queryKey: ["Generus", limit, page, search],
     queryFn: getGenerus,
   });
 
