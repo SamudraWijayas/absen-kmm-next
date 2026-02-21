@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, useMemo, Fragment } from "react";
 import useMessage from "./useMessage";
 import Image from "next/image";
-import { Button, Skeleton } from "@heroui/react";
+import { Button } from "@heroui/react";
 import { ChevronLeft, EllipsisVertical, SendHorizontal } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useRouter } from "next/navigation";
@@ -247,7 +247,7 @@ const Message = () => {
                       {/* Chat bubble */}
                       <div
                         className={cn(
-                          "max-w-[70%] px-4 py-2 rounded-2xl shadow break-words",
+                          "max-w-[70%] px-4 py-2 rounded-2xl shadow wrap-break-words",
                           isCurrentUser
                             ? "bg-blue-600 text-white rounded-br-none"
                             : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-bl-none",

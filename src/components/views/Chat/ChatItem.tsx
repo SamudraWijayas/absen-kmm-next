@@ -123,7 +123,7 @@ const ChatItem = (props: Proptypes) => {
         >
           <div className="flex items-center space-x-3">
             {/* Avatar + Online Indicator */}
-            <div className="relative w-12 h-12 flex-shrink-0">
+            <div className="relative w-12 h-12 shrink-0">
               <div className="w-full h-full rounded-full overflow-hidden bg-gray-200 flex items-center justify-center text-white font-bold text-lg">
                 {chat.type === "group" ? (
                   chat.image ? (

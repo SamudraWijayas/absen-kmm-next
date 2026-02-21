@@ -14,7 +14,6 @@ import { useEffect, useState } from "react";
 import Datepicker from "@/components/ui/Datepicker/Datepicker";
 import SetPassword from "./SetPaaword/SetPassword";
 import { useSession } from "next-auth/react";
-import LandingPageFooter from "@/components/layouts/LandingPageLayout/LandingPageFooter";
 
 const banner = [
   {
