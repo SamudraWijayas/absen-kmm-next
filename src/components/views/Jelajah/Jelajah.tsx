@@ -4,7 +4,9 @@ import Image from "next/image";
 import { Camera } from "lucide-react";
 import useJelajah from "./useJelajah";
 import { IKegiatan } from "@/types/Kegiatan";
-import { Skeleton } from "@heroui/react";
+import { Skeleton, useDisclosure } from "@heroui/react";
+import { useState } from "react";
+import JelajahModal from "./JelajahModal";
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString("id-ID", {
@@ -16,6 +18,10 @@ const formatDate = (date: string) => {
 
 const Jelajah = () => {
   const { dataKegiatan, isLoadingKegiatan } = useJelajah();
+  const [selectedKegiatan, setSelectedKegiatan] = useState<IKegiatan | null>(
+    null,
+  );
+  const jelajahModal = useDisclosure();
 
   const kegiatanList: IKegiatan[] = Array.isArray(dataKegiatan?.data)
     ? dataKegiatan.data
@@ -83,7 +89,7 @@ const Jelajah = () => {
   // Card
   // =============================
   const renderCard = (item: IKegiatan) => {
-    const imageUrl = item.dokumentasi?.[0]?.url || "/bg.png";
+    const imageUrl = item.dokumentasi?.[0]?.url;
 
     // const lokasi =
     //   item.daerah?.name || item.desa?.name || item.kelompok?.name || "-";
@@ -91,19 +97,31 @@ const Jelajah = () => {
     return (
       <div
         key={item.id}
+        onClick={() => {
+          setSelectedKegiatan(item); 
+          jelajahModal.onOpen();
+        }}
         className="group bg-white dark:bg-gray-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700"
       >
-        <div className="relative w-full h-32 sm:h-40 overflow-hidden">
-          <Image
-            src={`${process.env.NEXT_PUBLIC_IMAGE}${imageUrl}`}
-            alt={item.name ?? ""}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-          <div className="absolute top-2 right-2 bg-black/60 backdrop-blur text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-            <Camera size={12} />
-            Dokumentasi
-          </div>
+        <div className="relative w-full h-32 sm:h-40 overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+          {imageUrl ? (
+            <>
+              <Image
+                src={`${process.env.NEXT_PUBLIC_IMAGE}${imageUrl}`}
+                alt={item.name ?? ""}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute top-2 right-2 bg-black/60 backdrop-blur text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                <Camera size={12} />
+                Dokumentasi
+              </div>
+            </>
+          ) : (
+            <div className="text-xs text-gray-400 text-center px-2">
+              Belum ada dokumentasi
+            </div>
+          )}
         </div>
 
         <div className="p-3">
@@ -179,6 +197,7 @@ const Jelajah = () => {
           )}
         </>
       )}
+      <JelajahModal {...jelajahModal} data={selectedKegiatan} />
     </div>
   );
 };

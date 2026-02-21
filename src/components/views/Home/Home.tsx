@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import Datepicker from "@/components/ui/Datepicker/Datepicker";
 import SetPassword from "./SetPaaword/SetPassword";
 import { useSession } from "next-auth/react";
+import LandingPageFooter from "@/components/layouts/LandingPageLayout/LandingPageFooter";
 
 const banner = [
   {
@@ -293,9 +294,6 @@ const Homes = () => {
             </Swiper>
           </div>
         </div>
-        {/* <div className="pb-10">
-          <LandingPageFooter />
-        </div> */}
       </div>
       <SetPassword
         isOpen={isModalOpen}
@@ -303,6 +301,25 @@ const Homes = () => {
         onOpenChange={() => setIsModalOpen(!isModalOpen)} // toggle saja
         refetch={refetchProfile}
       />
+      <footer className=" dark:from-gray-900 dark:to-black text-gray-800 dark:text-gray-200 border-t border-gray-200 dark:border-gray-700 px-6 pb-6">
+        {/* Versi Aplikasi */}
+        <div className="text-center mb-3 text-sm text-gray-500 dark:text-gray-400">
+          <span className="font-semibold">v1.0.0</span>
+        </div>
+
+        <div className="text-center text-sm">
+          &copy; 2025 <span className="font-semibold">Generusbdl</span>.
+          Developed by{" "}
+          <a
+            href="https://samudrawjya.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-blue-600 hover:text-blue-500 hover:underline transition-colors"
+          >
+            Sam
+          </a>
+        </div>
+      </footer>
     </div>
   );
 };

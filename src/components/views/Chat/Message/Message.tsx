@@ -375,6 +375,10 @@ const Message = ({ initialTheme }: Props) => {
                       }}
                       placeholder="Ketik pesan"
                       className="flex-1 bg-transparent outline-none text-sm h-full"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
                     />
                   </div>
                 )}

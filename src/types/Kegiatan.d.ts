@@ -64,7 +64,7 @@ interface IKegiatan {
 interface IDokumentasi {
   id: string;
   kegiatanId: string;
-  url: string;
+  url?: string;
 }
 
 export type { IKegiatanForm, IKegiatan, Peserta, IDataKegiatan };
