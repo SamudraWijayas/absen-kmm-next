@@ -107,7 +107,6 @@ const Profile = () => {
             width={200}
             height={200}
             alt="profile"
-            unoptimized
             onClick={triggerFileSelect}
             className="w-30 h-30 rounded-full object-cover border-4 border-white shadow-md cursor-pointer transition"
           />
