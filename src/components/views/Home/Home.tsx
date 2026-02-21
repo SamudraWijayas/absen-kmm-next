@@ -112,7 +112,6 @@ const Homes = () => {
                   ? `${process.env.NEXT_PUBLIC_IMAGE}${dataProfile.foto}`
                   : "/profil.jpg"
               }
-              unoptimized
               alt="Profile"
               width={200}
               height={200}

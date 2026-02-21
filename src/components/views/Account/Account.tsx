@@ -49,7 +49,6 @@ const Account = () => {
               width={200}
               height={200}
               alt="profile"
-              unoptimized
               className="w-16 h-16 object-cover rounded-full"
             />
 

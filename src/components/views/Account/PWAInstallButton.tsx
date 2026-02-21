@@ -12,7 +12,8 @@ export default function PWAInstallButton() {
   }
 
   return (
-    <button className="flex gap-2 items-center cursor-pointer">
+    <button className="flex gap-2 items-center cursor-pointer"
+      onClick={installApp}>
       <Download size={20} />
       Instal App
       <span className="text-sm"></span>
