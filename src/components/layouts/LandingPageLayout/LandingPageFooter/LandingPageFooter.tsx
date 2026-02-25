@@ -18,7 +18,7 @@ const LandingPageFooter = () => {
           rel="noopener noreferrer"
           className="font-semibold text-blue-600 hover:text-blue-500 hover:underline transition-colors"
         >
-          Sam
+          Jokindess
         </a>
       </div>
     </footer>

@@ -27,6 +27,16 @@ const banner = [
     title: "Keputrian",
     image: "/images/pengurus/kp.jpg",
   },
+  {
+    id: "3",
+    title: "FMI",
+    image: "/images/pengurus/fmi.jpeg",
+  },
+  {
+    id: "4",
+    title: "Pionir",
+    image: "/images/pengurus/pionir.jpeg",
+  },
 ];
 
 const Homes = () => {

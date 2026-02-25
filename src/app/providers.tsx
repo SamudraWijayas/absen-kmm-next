@@ -1,7 +1,8 @@
 "use client";
 
+import AppShell from "@/components/common/AppShell";
 import { SocketProvider } from "@/contexts/SocketProvider";
-import ToasterProvider from "@/contexts/ToasterContext";
+import {ToasterProvider} from "@/contexts/ToasterContext";
 import { onErrorHander } from "@/libs/axios/responseHanler";
 import { HeroUIProvider } from "@heroui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -39,6 +40,8 @@ function InnerProviders({ children }: { children: React.ReactNode }) {
         disableTransitionOnChange
       >
         <ToasterProvider>
+          {/* <PushNotification userId={userId} /> */}
+
           <SocketProvider userId={userId}>{children}</SocketProvider>
         </ToasterProvider>
       </NextThemesProvider>
@@ -51,7 +54,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <QueryClientProvider client={queryClient}>
-        <InnerProviders>{children}</InnerProviders>
+        <InnerProviders>
+          <AppShell>{children}</AppShell>
+        </InnerProviders>
       </QueryClientProvider>
     </SessionProvider>
   );

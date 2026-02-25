@@ -9,7 +9,8 @@ const endpoint = {
   GROUP: "/group",
   MESSAGE: "/messages",
   CONVERSATION: "/conversations",
-  GENERUS: "/generus"
+  GENERUS: "/generus",
+  PUSH: "/push"
 };
 
 export default endpoint;
