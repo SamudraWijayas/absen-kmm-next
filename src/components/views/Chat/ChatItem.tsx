@@ -38,6 +38,16 @@ const ChatItem = (props: Proptypes) => {
   let avatar = "/profil.jpg";
   let userId: number | null = null;
   const id: string = chat.conversationId;
+  const IMAGE_BASE = process.env.NEXT_PUBLIC_IMAGE || "";
+
+  const getImageUrl = (path?: string) => {
+    if (!path) return "/profil.jpg";
+
+    // kalau sudah full URL (http/https) jangan ditambah base lagi
+    if (path.startsWith("http")) return path;
+
+    return `${IMAGE_BASE}${path}`;
+  };
 
   let lastMessage = chat.lastMessage || "";
 
@@ -52,11 +62,11 @@ const ChatItem = (props: Proptypes) => {
 
   if (chat.type === "personal") {
     name = chat.user.nama;
-    avatar = chat.user.foto || avatar;
+    avatar = getImageUrl(chat.user.foto || avatar);
     userId = chat.user.id;
   } else if (chat.type === "group") {
     name = chat.name;
-    avatar = chat.image || avatar;
+    avatar = getImageUrl(chat.image || avatar);
   }
 
   const isOnline = userId ? onlineUsers.has(userId) : false;
@@ -128,7 +138,7 @@ const ChatItem = (props: Proptypes) => {
                 {chat.type === "group" ? (
                   chat.image ? (
                     <Image
-                      src={chat.image}
+                      src={getImageUrl(chat.image)}
                       alt={name}
                       width={100}
                       height={100}
