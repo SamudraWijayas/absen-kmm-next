@@ -101,7 +101,7 @@ const Jelajah = () => {
           setSelectedKegiatan(item); 
           jelajahModal.onOpen();
         }}
-        className="group bg-white dark:bg-gray-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700"
+        className="group bg-white cursor-pointer dark:bg-gray-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700"
       >
         <div className="relative w-full h-32 sm:h-40 overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
           {imageUrl ? (

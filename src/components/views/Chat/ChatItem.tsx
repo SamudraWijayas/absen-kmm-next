@@ -43,8 +43,9 @@ const ChatItem = (props: Proptypes) => {
   const getImageUrl = (path?: string) => {
     if (!path) return "/profil.jpg";
 
-    // kalau sudah full URL (http/https) jangan ditambah base lagi
     if (path.startsWith("http")) return path;
+
+    if (path === "/profil.jpg") return path;
 
     return `${IMAGE_BASE}${path}`;
   };
