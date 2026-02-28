@@ -12,12 +12,13 @@ import {
   SendHorizontal,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Controller } from "react-hook-form";
 import useProfile from "@/hooks/useProfile";
 import Emoji from "@/components/ui/Emoji/Emoji";
 import Setting from "./Setting/Setting";
 import { chatThemes } from "../../constants/chatThemes";
+import { motion } from "framer-motion";
 
 interface Props {
   initialTheme: string;
@@ -76,7 +77,26 @@ const Message = ({ initialTheme }: Props) => {
     handleSubmitForm,
     handleSendMessage,
     markAsRead,
+    typingUsers,
+    handleTyping,
+    onlineUsers,
   } = useMessage();
+
+  const params = useParams();
+  const id = params?.id as string; // conversationId
+
+  // ====================== USERS TYPING ======================
+  // const usersTyping = typingUsers[id]
+  //   ? Array.from(typingUsers[id]).filter((userId) => userId !== currentUserId)
+  //   : [];
+
+  const usersTyping = useMemo(() => {
+    if (!typingUsers[id]) return [];
+    return Array.from(typingUsers[id]).filter(
+      (userId) => userId !== currentUserId,
+    );
+  }, [typingUsers, id, currentUserId]);
+  // useTypingSound(usersTyping);
 
   const messages = useMemo(() => dataMessage?.data ?? [], [dataMessage?.data]);
 
@@ -91,13 +111,16 @@ const Message = ({ initialTheme }: Props) => {
   // scroll ke bawah setiap update message
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
-  }, [messages]);
+  }, [messages, usersTyping]);
 
   const conversation = dataConversation as IConversation | undefined;
 
   const otherUser = conversation?.participants.find(
     (p) => p.mumiId !== currentUserId,
   );
+
+  const userId = otherUser?.mumi.id;
+  const isOnline = userId != null && onlineUsers.has(userId);
 
   const chatName = conversation?.isGroup
     ? (conversation.name ?? "")
@@ -164,9 +187,19 @@ const Message = ({ initialTheme }: Props) => {
               />
             </div>
 
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              {truncateText(chatName, 18)}
-            </h1>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                {truncateText(chatName, 15)}
+              </h1>
+
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {usersTyping.length > 0
+                  ? "Mengetik..."
+                  : isOnline
+                    ? "Online"
+                    : ""}
+              </p>
+            </div>
           </div>
 
           {/* Dropdown Menu */}
@@ -231,6 +264,7 @@ const Message = ({ initialTheme }: Props) => {
                   msg.createdAt,
                   previousMessage?.createdAt,
                 );
+
                 const isCurrentUser = msg.senderId === currentUserId;
 
                 const date = new Date(msg.createdAt);
@@ -338,6 +372,31 @@ const Message = ({ initialTheme }: Props) => {
                   </React.Fragment>
                 );
               })}
+              {usersTyping.length > 0 && (
+                <div className="flex px-4 pt-2">
+                  <div
+                    className={cn(
+                      "bg-white dark:bg-zinc-800 px-4 py-2 rounded-2xl rounded-bl-sm shadow-sm max-w-20",
+                      currentTheme.bubbleOther,
+                    )}
+                  >
+                    <div className="flex items-center gap-1 h-4">
+                      {[0, 1, 2].map((i) => (
+                        <motion.span
+                          key={i}
+                          className="w-1.5 h-1.5 bg-gray-500 rounded-full"
+                          animate={{ y: [0, -4, 0] }}
+                          transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: i * 0.2,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -372,6 +431,10 @@ const Message = ({ initialTheme }: Props) => {
                       ref={(e) => {
                         field.ref(e);
                         inputRef.current = e;
+                      }}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleTyping(); // ⬅️ trigger typing
                       }}
                       placeholder="Ketik pesan"
                       className="flex-1 bg-transparent outline-none text-sm h-full"

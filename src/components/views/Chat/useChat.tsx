@@ -8,7 +8,7 @@ import { ToasterContext } from "@/contexts/ToasterContext";
 const useChat = () => {
   const { setToaster } = useContext(ToasterContext);
   const { currentSearch } = useChangeUrl();
-  const { socket, onlineUsers } = useSocket();
+  const { socket, onlineUsers, } = useSocket();
   const getChatList = async () => {
     let params = ``;
     if (currentSearch) {

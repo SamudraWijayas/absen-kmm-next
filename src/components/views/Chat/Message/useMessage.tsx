@@ -1,6 +1,6 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import chatService from "@/service/chat.service";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -19,7 +19,9 @@ const useMessage = () => {
   const { dataProfile } = useProfile();
   const currentUserId = dataProfile?.id;
 
-  const { socket } = useSocket(); // ambil socket
+  const { socket, startTyping, stopTyping, typingUsers, onlineUsers } =
+    useSocket();
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // ================= GET MESSAGES =================
   const getMessages = async () => {
@@ -85,7 +87,7 @@ const useMessage = () => {
       ...data,
       conversationId: id,
     });
-
+    stopTyping(id);
     reset();
   };
 
@@ -121,6 +123,20 @@ const useMessage = () => {
     };
   }, [socket, id, refetchMessage]);
 
+  const handleTyping = () => {
+    if (!id) return;
+
+    startTyping(id);
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      stopTyping(id);
+    }, 1500);
+  };
+
   return {
     dataMessage,
     isLoadingMessage,
@@ -130,6 +146,9 @@ const useMessage = () => {
     handleSubmitForm,
     handleSendMessage,
     markAsRead,
+    typingUsers,
+    handleTyping,
+    onlineUsers,
   };
 };
 
