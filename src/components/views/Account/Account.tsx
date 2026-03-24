@@ -2,13 +2,14 @@
 
 import { ThemeSwitcher } from "../../ThemeSwitcher/ThemeSwitcher";
 import Image from "next/image";
-import { User, Lock, LogOut } from "lucide-react";
+import { User, Lock, LogOut, Info } from "lucide-react";
 import Link from "next/link";
 import useProfile from "@/hooks/useProfile";
 import { signOut, useSession } from "next-auth/react";
 import { Skeleton } from "@heroui/react";
 import PWAInstallButton from "./PWAInstallButton";
 import LandingPageFooter from "@/components/layouts/LandingPageLayout/LandingPageFooter";
+import AdBanner from "@/components/ui/AdSense/AdBanner";
 
 const Account = () => {
   const { dataProfile } = useProfile();
@@ -90,6 +91,10 @@ const Account = () => {
                 </Link>
               </>
             )}
+            <Link href="/feedback" className="flex gap-2 items-center">
+              <Info size={20} />
+              <span className="text-sm">Feedback & Support</span>
+            </Link>
             <PWAInstallButton />
             {isAuthenticated && (
               <button
@@ -102,6 +107,13 @@ const Account = () => {
             )}
           </div>
         </div>
+      </div>
+      <div className="w-full min-h-25">
+        <AdBanner
+          dataAdFormat="auto"
+          dataFullWidthResponsive={true}
+          dataAdSlot="4840458474"
+        />
       </div>
 
       {/* Footer */}

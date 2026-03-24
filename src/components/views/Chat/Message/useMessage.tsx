@@ -45,13 +45,16 @@ const useMessage = () => {
     return res.data.data;
   };
 
-  const { data: dataConversation, isLoading: isLoadingConversation } = useQuery(
-    {
-      queryKey: ["Conversations", id],
-      queryFn: getConversation,
-      enabled: !!id,
-    },
-  );
+  const {
+    data: dataConversation,
+    isLoading: isLoadingConversation,
+    isRefetching: isRefetchingConversation,
+    refetch: refetchConversation,
+  } = useQuery({
+    queryKey: ["Conversations", id],
+    queryFn: getConversation,
+    enabled: !!id,
+  });
 
   // ================= REACT HOOK FORM =================
   const {
@@ -142,6 +145,8 @@ const useMessage = () => {
     isLoadingMessage,
     dataConversation,
     isLoadingConversation,
+    isRefetchingConversation,
+    refetchConversation,
     control,
     handleSubmitForm,
     handleSendMessage,

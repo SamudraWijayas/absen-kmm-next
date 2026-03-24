@@ -15,6 +15,7 @@ import Datepicker from "@/components/ui/Datepicker/Datepicker";
 import SetPassword from "./SetPaaword/SetPassword";
 import { useSession } from "next-auth/react";
 import LandingPageFooter from "@/components/layouts/LandingPageLayout/LandingPageFooter";
+import AdBanner from "@/components/ui/AdSense/AdBanner";
 
 const banner = [
   {
@@ -311,6 +312,13 @@ const Homes = () => {
         onOpenChange={() => setIsModalOpen(!isModalOpen)} // toggle saja
         refetch={refetchProfile}
       />
+      <div className="w-full min-h-25">
+        <AdBanner
+          dataAdFormat="auto"
+          dataFullWidthResponsive={true}
+          dataAdSlot="4840458474"
+        />
+      </div>
       <footer className=" dark:from-gray-900 dark:to-black text-gray-800 dark:text-gray-200 border-t border-gray-200 dark:border-gray-700 px-6 pb-6">
         {/* Versi Aplikasi */}
         <div className="text-center mb-3 text-sm text-gray-500 dark:text-gray-400">

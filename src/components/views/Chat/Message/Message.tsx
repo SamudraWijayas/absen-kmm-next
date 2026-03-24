@@ -53,6 +53,7 @@ interface IConversation {
   isGroup: boolean;
   name: string | null;
   participants: IParticipant[];
+  createdById: number;
 }
 
 const Message = ({ initialTheme }: Props) => {
@@ -74,6 +75,8 @@ const Message = ({ initialTheme }: Props) => {
     isLoadingMessage,
     dataConversation,
     control,
+    isRefetchingConversation,
+    refetchConversation,
     handleSubmitForm,
     handleSendMessage,
     markAsRead,
@@ -465,6 +468,12 @@ const Message = ({ initialTheme }: Props) => {
         {...setting}
         activeTheme={activeTheme}
         setActiveTheme={setActiveTheme}
+        chatName={chatName}
+        photoSrc={photoSrc}
+        conversation={conversation?.isGroup}
+        refetchConversation={refetchConversation}
+        participants={conversation?.participants}
+        createdById={conversation?.createdById}
       />
     </Fragment>
   );

@@ -5,6 +5,7 @@ import { Users, MapPin, ChevronRight } from "lucide-react";
 import useListKelompok from "./useListKelompok";
 import { IKelompok } from "@/types/Kelompok";
 import { Skeleton } from "@heroui/react";
+import AdBanner from "@/components/ui/AdSense/AdBanner";
 
 const ListKelompok = () => {
   const { dataKelompok, isLoadingKelompok } = useListKelompok();
@@ -54,6 +55,13 @@ const ListKelompok = () => {
             </button>
           </div>
         ))}
+      </div>
+      <div className="w-full min-h-25">
+        <AdBanner
+          dataAdFormat="auto"
+          dataFullWidthResponsive={true}
+          dataAdSlot="4840458474"
+        />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import instance from "@/libs/axios/instance";
 import endpoint from "./endpoint.constant";
-import { IGroup, IPrivate, ISendMessage } from "@/types/Chat";
+import { IConvertation, IGroup, IPrivate, ISendMessage } from "@/types/Chat";
 
 const chatService = {
   getListChat: (params?: string) =>
@@ -23,6 +23,8 @@ const chatService = {
     instance.post(`${endpoint.CONVERSATION}/private`, payload),
   deleteConversations: (conversationId: string) =>
     instance.delete(`${endpoint.CONVERSATION}/${conversationId}`),
+  updateConversations: (conversationId: string, payload: IConvertation) =>
+    instance.patch(`${endpoint.CONVERSATION}/group/${conversationId}`, payload),
 };
 
 export default chatService;

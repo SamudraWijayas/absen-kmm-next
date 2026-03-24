@@ -18,6 +18,7 @@ import { IGenerus } from "@/types/Generus";
 import { Controller } from "react-hook-form";
 import useFilter from "@/hooks/useFilter";
 import { AlertTriangle, Search } from "lucide-react";
+import Image from "next/image";
 
 interface PropTypes {
   isOpen: boolean;
@@ -99,7 +100,12 @@ const AddGroup = ({
               onChange={(e) => setQuery(e.target.value)}
               className="px-4 py-2 rounded-full border border-gray-300 focus:outline-none"
             /> */}
-
+            <div className="flex items-center gap-2 rounded-md bg-yellow-50 p-3 text-sm text-yellow-700">
+              <AlertTriangle size={18} />
+              <span>
+                Cari Teman yang ingin diinvite <b>Grup</b>.
+              </span>
+            </div>
             <Input
               isClearable
               className="w-full"
@@ -108,12 +114,6 @@ const AddGroup = ({
               onClear={handleClearSearch}
               onChange={handleSearch}
             />
-            <div className="flex items-center gap-2 rounded-md bg-yellow-50 p-3 text-sm text-yellow-700">
-              <AlertTriangle size={18} />
-              <span>
-                Cari Teman yang ingin diinvite <b>Grup</b>.
-              </span>
-            </div>
 
             {/* List */}
             {isLoadingGenerus ? (
@@ -125,7 +125,7 @@ const AddGroup = ({
                 {mumiList.map((mumi: IGenerus) => (
                   <label
                     key={mumi.id}
-                    className="flex items-center gap-3 rounded-lg border border-gray-200 p-3 transition"
+                    className="flex items-center gap-3 rounded-lg  p-3 transition cursor-pointer"
                   >
                     <Checkbox
                       isSelected={selectedIds.includes(mumi.id)}
@@ -133,7 +133,18 @@ const AddGroup = ({
                       color="primary"
                       radius="sm"
                     />
-                    <div className="flex flex-col">
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={
+                          mumi.foto
+                            ? `${process.env.NEXT_PUBLIC_IMAGE}${mumi.foto}`
+                            : "/profil.jpg"
+                        }
+                        alt="image"
+                        width={100}
+                        height={100}
+                        className="object-cover w-10 h-10 rounded-full"
+                      />
                       <span className="font-medium">{mumi.nama}</span>
                     </div>
                   </label>

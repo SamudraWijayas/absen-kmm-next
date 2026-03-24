@@ -9,6 +9,7 @@ import {
   Input,
   Pagination,
 } from "@heroui/react";
+import Image from "next/image";
 import useAddGroup from "./useAddPrivate";
 import { useEffect } from "react";
 import { IGenerus } from "@/types/Generus";
@@ -53,7 +54,6 @@ const AddGroup = (props: PropTypes) => {
   const mumiList = dataGenerus?.data ?? [];
   const totalPages = dataGenerus?.pagination.totalPages || 0;
 
-
   useEffect(() => {
     if (isSuccessMutateAddPrivate) {
       onClose();
@@ -87,7 +87,7 @@ const AddGroup = (props: PropTypes) => {
                   return (
                     <label
                       key={mumi.id}
-                      className="flex items-center gap-3 rounded-lg border border-gray-200 p-3 transition"
+                      className="flex items-center gap-3 rounded-lg p-3 transition cursor-pointer"
                     >
                       <Controller
                         name="targetUserId"
@@ -105,7 +105,18 @@ const AddGroup = (props: PropTypes) => {
                         )}
                       />
 
-                      <div className="flex flex-col">
+                      <div className="flex items-center gap-3">
+                        <Image
+                          src={
+                            mumi.foto
+                              ? `${process.env.NEXT_PUBLIC_IMAGE}${mumi.foto}`
+                              : "/profil.jpg"
+                          }
+                          alt="image"
+                          width={100}
+                          height={100}
+                          className="object-cover w-10 h-10 rounded-full"
+                        />
                         <span className="font-medium">{mumi.nama}</span>
                       </div>
                     </label>

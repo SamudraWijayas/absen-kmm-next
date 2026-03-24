@@ -5,6 +5,7 @@ import { Users, MapPin, ChevronRight } from "lucide-react";
 import useListDesa from "./useListDesa";
 import { Skeleton } from "@heroui/react";
 import { IDesa } from "@/types/Desa";
+import AdBanner from "@/components/ui/AdSense/AdBanner";
 
 const ListDesa = () => {
   const { dataDesa, isLoadingDesa } = useListDesa();
@@ -50,6 +51,13 @@ const ListDesa = () => {
             </button>
           </div>
         ))}
+      </div>
+      <div className="w-full min-h-25">
+        <AdBanner
+          dataAdFormat="auto"
+          dataFullWidthResponsive={true}
+          dataAdSlot="4840458474"
+        />
       </div>
     </div>
   );

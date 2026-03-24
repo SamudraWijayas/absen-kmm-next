@@ -97,6 +97,22 @@ interface IPrivate {
   targetUserId: number;
 }
 
+interface IConvertation {
+  conversationId?: string;
+  name?: string;
+  image?: string | FileList;
+}
+
+interface IParticipant {
+  id?: number | string;
+  mumiId?: number | string;
+  mumi: {
+    id?: number | string;
+    nama?: string;
+    foto?: string;
+  };
+}
+
 export type {
   IChat,
   IMessages,
@@ -107,7 +123,8 @@ export type {
   IMessageResponse,
   IMessage,
   IMessageSender,
-  IMessage,
   ISendMessage,
   IPrivate,
+  IConvertation,
+  IParticipant,
 };

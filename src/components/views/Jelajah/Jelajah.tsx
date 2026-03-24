@@ -7,6 +7,7 @@ import { IKegiatan } from "@/types/Kegiatan";
 import { Skeleton, useDisclosure } from "@heroui/react";
 import { useState } from "react";
 import JelajahModal from "./JelajahModal";
+import AdBanner from "@/components/ui/AdSense/AdBanner";
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString("id-ID", {
@@ -98,7 +99,7 @@ const Jelajah = () => {
       <div
         key={item.id}
         onClick={() => {
-          setSelectedKegiatan(item); 
+          setSelectedKegiatan(item);
           jelajahModal.onOpen();
         }}
         className="group bg-white cursor-pointer dark:bg-gray-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700"
@@ -197,6 +198,13 @@ const Jelajah = () => {
           )}
         </>
       )}
+      <div className="w-full min-h-25">
+        <AdBanner
+          dataAdFormat="auto"
+          dataFullWidthResponsive={true}
+          dataAdSlot="4840458474"
+        />
+      </div>
       <JelajahModal {...jelajahModal} data={selectedKegiatan} />
     </div>
   );
