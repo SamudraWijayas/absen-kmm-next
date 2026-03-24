@@ -19,6 +19,7 @@ import Emoji from "@/components/ui/Emoji/Emoji";
 import Setting from "./Setting/Setting";
 import { chatThemes } from "../../constants/chatThemes";
 import { motion } from "framer-motion";
+import BottomSheet from "@/components/ui/BottomSheet/BottomSheet";
 
 interface Props {
   initialTheme: string;
@@ -59,6 +60,7 @@ interface IConversation {
 const Message = ({ initialTheme }: Props) => {
   const { dataProfile } = useProfile();
   const currentUserId = dataProfile?.id;
+  const [open, setOpen] = useState(false);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const setting = useDisclosure();
@@ -210,7 +212,7 @@ const Message = ({ initialTheme }: Props) => {
             isIconOnly
             size="sm"
             variant="light"
-            onPress={setting.onOpen}
+            onPress={() => setOpen(true)}
             className="hover:bg-gray-100 dark:hover:bg-gray-800 transition"
           >
             <EllipsisVertical className="text-gray-700 dark:text-gray-300" />
@@ -464,17 +466,25 @@ const Message = ({ initialTheme }: Props) => {
           </div>
         </div>
       </div>
-      <Setting
-        {...setting}
-        activeTheme={activeTheme}
-        setActiveTheme={setActiveTheme}
-        chatName={chatName}
-        photoSrc={photoSrc}
-        conversation={conversation?.isGroup}
-        refetchConversation={refetchConversation}
-        participants={conversation?.participants}
-        createdById={conversation?.createdById}
-      />
+
+      <BottomSheet
+        open={open}
+        onOpenChange={setOpen}
+        title="Settings"
+        snapPoints={[30, 60, 100]}
+        initialHeight={98}
+      >
+        <Setting
+          activeTheme={activeTheme}
+          setActiveTheme={setActiveTheme}
+          chatName={chatName}
+          photoSrc={photoSrc}
+          conversation={conversation?.isGroup}
+          refetchConversation={refetchConversation}
+          participants={conversation?.participants}
+          createdById={conversation?.createdById}
+        />
+      </BottomSheet>
     </Fragment>
   );
 };

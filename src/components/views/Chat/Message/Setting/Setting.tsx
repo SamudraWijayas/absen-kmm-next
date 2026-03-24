@@ -1,11 +1,3 @@
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-} from "@heroui/react";
 import { Check, ChevronLeft, Pencil, UserRoundPlus, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -13,11 +5,9 @@ import useSetting from "./useSetting";
 import { Controller } from "react-hook-form";
 import { IParticipant } from "@/types/Chat";
 import useProfile from "@/hooks/useProfile";
+import { Button } from "@heroui/react";
 
 interface PropTypes {
-  isOpen: boolean;
-  onClose: () => void;
-  onOpenChange: () => void;
   activeTheme: string;
   setActiveTheme: (theme: string) => void;
   chatName: string;
@@ -79,9 +69,6 @@ const themes = [
 ];
 
 const Setting = ({
-  isOpen,
-  onClose,
-  onOpenChange,
   activeTheme,
   setActiveTheme,
   chatName,
@@ -151,197 +138,206 @@ const Setting = ({
   }, [isSuccessMutateUpdateGrup, refetchConversation, resetUpdatePicture]);
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-      <ModalContent className="max-w-md max-h-[90vh]">
-        <ModalHeader className="text-lg font-semibold flex items-center gap-2">
-          {view === "main" ? (
-            "Settings"
-          ) : (
-            <>
-              <div
-                onClick={() => setView("main")}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                {/* Bungkus icon */}
-                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
-                  <ChevronLeft  />
-                </div>
-
-                {/* Label back */}
-                <span className="text-sm text-black dark:text-white">
-                  Kembali
-                </span>
+    <div>
+      <div>
+        {view === "main" ? (
+          ""
+        ) : (
+          <>
+            <div
+              onClick={() => setView("main")}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              {/* Bungkus icon */}
+              <div className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+                <ChevronLeft />
               </div>
-            </>
-          )}
-        </ModalHeader>
 
-        <ModalBody className="overflow-y-auto">
-          {view === "main" ? (
-            <>
-              <div className="flex justify-center items-center">
-                <div className="flex flex-col justify-center items-center">
-                  <div className="relative w-fit group">
-                    {/* Image */}
-                    <Image
-                      src={preview || photoSrc || "/images/profile.jpg"}
-                      alt="avatar"
-                      width={200}
-                      height={200}
-                      className="w-26 h-26 object-cover rounded-full"
-                      onClick={triggerFileSelect}
-                    />
+              {/* Label back */}
+              <span className="text-sm text-black dark:text-white">
+                Kembali
+              </span>
+            </div>
+          </>
+        )}
+      </div>
 
-                    <Controller
-                      name="image"
-                      control={controlUpdatePicture}
-                      render={({ field: { onChange, value, ...field } }) => (
-                        <>
-                          <input
-                            {...field}
-                            ref={inputFileRef}
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={onSelectNewAvatar}
-                          />
-                          {preview && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                handleDeletePicture(() => {
-                                  onChange(undefined);
-                                  resetUpdatePicture();
-                                });
-                              }}
-                              className="absolute cursor-pointer -bottom-2 -left-2 w-7 h-7 flex items-center justify-center rounded-full bg-red-500 text-white shadow-md hover:bg-red-700 transition-all"
-                            >
-                              <X size={14} />
-                            </button>
-                          )}
-                          {preview && (
-                            <button
-                              type="button"
-                              onClick={handleSubmitUpdatePicture(
-                                handleUpdateGrup,
-                              )}
-                              className="absolute cursor-pointer -bottom-2 -right-2 w-7 h-7 flex items-center justify-center rounded-full bg-blue-500 text-white shadow-md hover:bg-blue-700 transition-all"
-                            >
-                              <Check size={14} />
-                            </button>
-                          )}
-                        </>
-                      )}
-                    />
-                    {!preview && (
-                      <div
-                        className="absolute inset-0 rounded-full flex items-center text-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 cursor-pointer transition"
+      <div>
+        {view === "main" ? (
+          <>
+            <div className="flex justify-center items-center">
+              <div className="flex flex-col justify-center items-center">
+                {conversation ? (
+                  <div className="flex justify-center">
+                    <div className="relative group w-fit">
+                      {/* Image */}
+                      <Image
+                        src={preview || photoSrc || "/images/profile.jpg"}
+                        alt="avatar"
+                        width={200}
+                        height={200}
+                        className="w-26 h-26 object-cover rounded-full"
                         onClick={triggerFileSelect}
-                      >
-                        <span className="text-white text-sm font-medium p-3">
-                          Change Photo
-                        </span>
-                      </div>
-                    )}
+                      />
 
-                    {isPendingMutateUploadFile && (
-                      <div className="absolute bottom-0 right-0 bg-white text-xs px-2 py-1 rounded shadow">
-                        Uploading...
-                      </div>
-                    )}
-                  </div>
-
-                  <form
-                    onSubmit={handleSubmitForm(handleUpdateGrup)}
-                    className="flex items-center gap-2 mt-2"
-                  >
-                    {conversation && isEditing ? (
-                      <div className="flex flex-col items-center gap-2">
-                        <Controller
-                          name="name"
-                          control={control}
-                          render={({ field }) => (
+                      <Controller
+                        name="image"
+                        control={controlUpdatePicture}
+                        render={({ field: { onChange, value, ...field } }) => (
+                          <>
                             <input
                               {...field}
-                              autoFocus
-                              className="text-lg font-semibold border-b border-gray-300 dark:border-gray-800 outline-none text-center"
+                              ref={inputFileRef}
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={onSelectNewAvatar}
                             />
-                          )}
-                        />
-
-                        <div className="flex gap-2">
-                          <Button
-                            type="submit"
-                            size="sm"
-                            color="primary"
-                            isLoading={isPendingMutateUpdateGrup}
-                          >
-                            Save
-                          </Button>
-
-                          <Button
-                            size="sm"
-                            variant="light"
-                            onPress={() => {
-                              setIsEditing(false);
-                              setValueUpdateGrup("name", chatName); // reset ke awal
-                            }}
-                          >
-                            Cancel
-                          </Button>
+                            {preview && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleDeletePicture(() => {
+                                    onChange(undefined);
+                                    resetUpdatePicture();
+                                  });
+                                }}
+                                className="absolute cursor-pointer -bottom-2 -left-2  w-7 h-7 flex items-center justify-center rounded-full bg-red-500 text-white shadow-md hover:bg-red-700 transition-all"
+                              >
+                                <X size={14} />
+                              </button>
+                            )}
+                            {preview && (
+                              <button
+                                type="button"
+                                onClick={handleSubmitUpdatePicture(
+                                  handleUpdateGrup,
+                                )}
+                                className="absolute cursor-pointer -bottom-2 -right-2 w-7 h-7 flex items-center justify-center rounded-full bg-blue-500 text-white shadow-md hover:bg-blue-700 transition-all"
+                              >
+                                <Check size={14} />
+                              </button>
+                            )}
+                          </>
+                        )}
+                      />
+                      {!preview && (
+                        <div
+                          className="absolute inset-0 rounded-full flex items-center text-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 cursor-pointer transition"
+                          onClick={triggerFileSelect}
+                        >
+                          <span className="text-white text-sm font-medium p-3">
+                            Change Photo
+                          </span>
                         </div>
-                      </div>
-                    ) : (
-                      <>
-                        <span className="text-lg font-semibold">
-                          {watch("name") || chatName}
-                        </span>
+                      )}
 
-                        {conversation && (
-                          <Pencil
-                            size={16}
-                            className="cursor-pointer text-gray-500 dark:text-white hover:text-black"
-                            onClick={() => setIsEditing(true)}
+                      {isPendingMutateUploadFile && (
+                        <div className="absolute bottom-0 right-0 bg-white text-xs px-2 py-1 rounded shadow">
+                          Uploading...
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <Image
+                    src={photoSrc}
+                    alt="avatar"
+                    width={200}
+                    height={200}
+                    className="w-26 h-26 object-cover rounded-full"
+                  />
+                )}
+
+                <form
+                  onSubmit={handleSubmitForm(handleUpdateGrup)}
+                  className="flex items-center gap-2 mt-2"
+                >
+                  {conversation && isEditing ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Controller
+                        name="name"
+                        control={control}
+                        render={({ field }) => (
+                          <input
+                            {...field}
+                            autoFocus
+                            className="text-lg font-semibold border-b border-gray-300 dark:border-gray-800 outline-none text-center"
                           />
                         )}
-                      </>
-                    )}
-                  </form>
-                </div>
-              </div>
-              <div className="mt-4 flex flex-col gap-5">
-                <span className="text-gray-600 dark:text-white font-semibold">
-                  Ubah tampilan chat
-                </span>
-                <div className="grid grid-cols-4 gap-3 ">
-                  {themes.map((theme) => {
-                    const isActive = activeTheme === theme.key;
+                      />
 
-                    return (
-                      <div
-                        key={theme.key}
-                        onClick={() => {
-                          setActiveTheme(theme.key);
-                          onClose();
-                        }}
-                        className={`cursor-pointer w-full h-28 rounded-xl border-2 ${
-                          isActive ? "border-primary" : "border-transparent"
-                        } flex items-center justify-center transition`}
-                        style={{
-                          backgroundImage: `url(${theme.image})`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center",
-                        }}
-                        title={theme.label}
-                      >
-                        {isActive && (
-                          <span className="text-white font-bold">✓</span>
-                        )}
+                      <div className="flex gap-2">
+                        <Button
+                          type="submit"
+                          size="sm"
+                          color="primary"
+                          isLoading={isPendingMutateUpdateGrup}
+                        >
+                          Save
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          variant="light"
+                          onPress={() => {
+                            setIsEditing(false);
+                            setValueUpdateGrup("name", chatName); // reset ke awal
+                          }}
+                        >
+                          Cancel
+                        </Button>
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="text-lg font-semibold">
+                        {watch("name") || chatName}
+                      </span>
+
+                      {conversation && (
+                        <Pencil
+                          size={16}
+                          className="cursor-pointer text-gray-500 dark:text-white hover:text-black"
+                          onClick={() => setIsEditing(true)}
+                        />
+                      )}
+                    </>
+                  )}
+                </form>
               </div>
+            </div>
+            <div className="mt-4 flex flex-col gap-5">
+              <span className="text-gray-600 dark:text-white font-semibold">
+                Ubah tampilan chat
+              </span>
+              <div className="grid grid-cols-4 gap-3 ">
+                {themes.map((theme) => {
+                  const isActive = activeTheme === theme.key;
+
+                  return (
+                    <div
+                      key={theme.key}
+                      className={`cursor-pointer w-full h-28 rounded-xl border-2 ${
+                        isActive ? "border-primary" : "border-transparent"
+                      } flex items-center justify-center transition`}
+                      style={{
+                        backgroundImage: `url(${theme.image})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                      title={theme.label}
+                    >
+                      {isActive && (
+                        <span className="text-white font-bold">✓</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {conversation ? (
               <div className="mt-6 flex flex-col gap-3">
                 <span className="text-gray-600 dark:text-white font-semibold">
                   {participants?.length || 0} Member
@@ -396,56 +392,52 @@ const Setting = ({
                   })}
                 </div>
               </div>
-            </>
-          ) : (
-            <>
-              {/* ===== VIEW TAMBAH MEMBER ===== */}
-              <span className="font-semibold">Tambah Member</span>
+            ) : (
+              ""
+            )}
+          </>
+        ) : (
+          <>
+            {/* ===== VIEW TAMBAH MEMBER ===== */}
+            <span className="font-semibold">Tambah Members</span>
 
-              <div className="flex flex-col gap-2">
-                {/* nanti ganti dengan data user dari API */}
-                {participants?.map((p) => {
-                  const foto = p.mumi?.foto
-                    ? `${process.env.NEXT_PUBLIC_IMAGE}${p.mumi.foto}`
-                    : "/profil.jpg";
+            <div className="flex flex-col gap-2">
+              {/* nanti ganti dengan data user dari API */}
+              {participants?.map((p) => {
+                const foto = p.mumi?.foto
+                  ? `${process.env.NEXT_PUBLIC_IMAGE}${p.mumi.foto}`
+                  : "/profil.jpg";
 
-                  return (
-                    <div
-                      key={p.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Image
-                          src={foto}
-                          alt={p.mumi?.nama || "user"}
-                          width={40}
-                          height={40}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
+                return (
+                  <div
+                    key={p.id}
+                    className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={foto}
+                        alt={p.mumi?.nama || "user"}
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
 
-                        <span className="text-sm font-medium">
-                          {p.mumi?.nama}
-                        </span>
-                      </div>
-
-                      <Button size="sm" color="primary">
-                        Tambah
-                      </Button>
+                      <span className="text-sm font-medium">
+                        {p.mumi?.nama}
+                      </span>
                     </div>
-                  );
-                })}
-              </div>
-            </>
-          )}
-        </ModalBody>
 
-        {/* <ModalFooter className="justify-end gap-2">
-          <Button color="danger" variant="light" onPress={onClose}>
-            Close
-          </Button>
-        </ModalFooter> */}
-      </ModalContent>
-    </Modal>
+                    <Button size="sm" color="primary">
+                      Tambah
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 };
 

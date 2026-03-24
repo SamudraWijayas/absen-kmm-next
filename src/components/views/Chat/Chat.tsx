@@ -6,6 +6,7 @@ import useChat from "./useChat";
 import { IChat } from "@/types/Chat";
 import { Skeleton } from "@heroui/react";
 import ChatItem from "./ChatItem";
+import BottomSheet from "@/components/ui/BottomSheet/BottomSheet";
 
 const Chat = () => {
   const { dataChatList, isLoadingChatList, onlineUsers, refetchChatList } =
