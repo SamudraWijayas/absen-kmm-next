@@ -1,6 +1,6 @@
 import instance from "@/libs/axios/instance";
 import endpoint from "@/service/endpoint.constant";
-import { ApiResponse, PushSubscribePayload } from "@/types/api";
+import { ApiResponse, saveFcmToken } from "@/types/api";
 
 const apiServices = {
   getKegiatanDaerah: (tanggal?: string) =>
@@ -27,8 +27,8 @@ const apiServices = {
   getGenerus: (params?: string) =>
     instance.get(`${endpoint.GENERUS}-mumi?${params}`),
 
-  pushNotification: (data: PushSubscribePayload) =>
-    instance.post(`${endpoint.PUSH}/subscribe`, data),
+  saveFcmToken: (data: saveFcmToken) =>
+    instance.post(`/save-token`, data),
 };
 
 export default apiServices;

@@ -3,10 +3,11 @@
 import React, { useRef, useEffect, useMemo, Fragment, useState } from "react";
 import useMessage from "./useMessage";
 import Image from "next/image";
-import { Button, useDisclosure } from "@heroui/react";
+import { Button } from "@heroui/react";
 import {
   Check,
   CheckCheck,
+  ChevronDown,
   ChevronLeft,
   EllipsisVertical,
   SendHorizontal,
@@ -20,6 +21,7 @@ import Setting from "./Setting/Setting";
 import { chatThemes } from "../../constants/chatThemes";
 import { motion } from "framer-motion";
 import BottomSheet from "@/components/ui/BottomSheet/BottomSheet";
+import { boolean } from "yup";
 
 interface Props {
   initialTheme: string;
@@ -31,6 +33,7 @@ interface IMessage {
   senderId: number;
   content: string;
   createdAt: string;
+  isDeleted: boolean;
   sender: {
     id: number;
     nama: string;
@@ -63,8 +66,14 @@ const Message = ({ initialTheme }: Props) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const setting = useDisclosure();
   const [activeTheme, setActiveTheme] = useState(initialTheme);
+  const [deletedMessages, setDeletedMessages] = useState<Set<number>>(
+    new Set(),
+  );
+  const handleDeleteForEveryoneWrapper = (msgId: number) => {
+    handleDeleteForEveryone(msgId); // panggil API / update DB
+    setDeletedMessages((prev) => new Set(prev).add(msgId)); // simpan di frontend
+  };
 
   useEffect(() => {
     document.cookie = `chatTheme=${activeTheme}; path=/; max-age=31536000`;
@@ -85,8 +94,13 @@ const Message = ({ initialTheme }: Props) => {
     typingUsers,
     handleTyping,
     onlineUsers,
-  } = useMessage();
 
+    toggleDropdown,
+    handleDeleteForMe,
+    handleDeleteForEveryone,
+    activeDropdownId,
+  } = useMessage();
+  const closeDropdown = () => toggleDropdown(-1); // atau id "kosong" yang tidak mungkin ada
   const params = useParams();
   const id = params?.id as string; // conversationId
 
@@ -170,6 +184,39 @@ const Message = ({ initialTheme }: Props) => {
     );
   };
 
+  // Untuk mobile long press
+  const longPressTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const handleLongPressStart = (messageId: number) => {
+    longPressTimeout.current = setTimeout(() => {
+      toggleDropdown(messageId);
+    }, 500); // tahan 500ms
+  };
+
+  const handleLongPressEnd = () => {
+    if (longPressTimeout.current) {
+      clearTimeout(longPressTimeout.current);
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (activeDropdownId) {
+        const dropdown = document.getElementById(
+          `dropdown-${activeDropdownId}`,
+        );
+        if (dropdown && !dropdown.contains(e.target as Node)) {
+          closeDropdown(); // pakai -1 sebagai "tidak ada"
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [activeDropdownId, closeDropdown]);
   return (
     <Fragment>
       <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/70 dark:bg-black/70  dark:border-gray-700 p-4 flex flex-col gap-2 md:gap-4">
@@ -310,21 +357,51 @@ const Message = ({ initialTheme }: Props) => {
                         </div>
                       )}
 
-                      {/* Chat bubble */}
+                      {/* Chat bubble wrapper */}
                       <div
                         className={cn(
-                          "max-w-[70%] px-4 py-2 rounded-2xl shadow wrap-break-words",
+                          "max-w-[70%] px-4 py-2 rounded-2xl shadow wrap-break-words relative group", // ⬅️ tambahkan 'group'
                           isCurrentUser
                             ? `${currentTheme.bubbleMe} rounded-br-none`
                             : `${currentTheme.bubbleOther} rounded-bl-none`,
                         )}
+                        onTouchStart={() =>
+                          isCurrentUser && handleLongPressStart(msg.id)
+                        }
+                        onTouchEnd={handleLongPressEnd}
+                        onMouseLeave={handleLongPressEnd}
                       >
                         {!isCurrentUser && (
                           <div className="text-xs font-medium text-gray-500 mb-1">
                             {msg.sender.nama}
                           </div>
                         )}
-                        <div>{msg.content}</div>
+                        {activeDropdownId === msg.id && (
+                          <div
+                            id={`dropdown-${msg.id}`}
+                            className="absolute right-0 w-46 p-2 bg-white rounded-xl dark:bg-gray-800 shadow-md  z-50 border border-gray-200 dark:border-gray-700"
+                          >
+                            <button
+                              onClick={() => handleDeleteForMe(msg.id)}
+                              className="w-full text-left px-2 py-2  hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-black"
+                            >
+                              Delete for me
+                            </button>
+                            <button
+                              onClick={() => handleDeleteForEveryone(msg.id)}
+                              className="w-full text-left px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-black"
+                            >
+                              Delete for everyone
+                            </button>
+                          </div>
+                        )}
+                        <div
+                          className={
+                            msg.isDeleted ? "italic text-gray-400" : ""
+                          }
+                        >
+                          {msg.isDeleted ? "Pesan telah dihapus" : msg.content}
+                        </div>
                         <div className="flex justify-end items-center mt-1 gap-1 text-xs">
                           <span
                             className={
@@ -355,6 +432,21 @@ const Message = ({ initialTheme }: Props) => {
                             </span>
                           )}
                         </div>
+
+                        {/* Desktop dropdown button, muncul hanya saat hover */}
+                        {isCurrentUser && (
+                          <button
+                            onClick={() => toggleDropdown(msg.id)}
+                            className={cn(
+                              "absolute top-1 right-1 p-1 text-gray-400 hover:text-gray-700 opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out",
+                              currentTheme.bubbleMe,
+                            )}
+                          >
+                            <ChevronDown />
+                          </button>
+                        )}
+
+                        {/* Dropdown menu */}
                       </div>
 
                       {/* Avatar kanan */}

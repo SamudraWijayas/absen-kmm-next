@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import AdSense from "@/components/ui/AdSense/AdSense";
+import FcmProvider from "./FcmProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,13 +36,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
+      {/* <head>
         <AdSense pId="7302668061459256" />
-      </head>
+      </head> */}
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <FcmProvider />
+          {children}
+        </Providers>
       </body>
     </html>
   );

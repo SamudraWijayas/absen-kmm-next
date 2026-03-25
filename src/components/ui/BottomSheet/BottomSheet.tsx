@@ -24,10 +24,13 @@ const BottomSheet = ({
 }: BottomSheetProps) => {
   const [height, setHeight] = useState(initialHeight);
   const [isDragging, setIsDragging] = useState(false);
+
   const isTouching = useRef(false);
-  const DRAG_THRESHOLD = 10;
   const startY = useRef(0);
   const startHeight = useRef(initialHeight);
+  const dragSource = useRef<"header" | "content" | null>(null);
+
+  const DRAG_THRESHOLD = 10;
 
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -54,28 +57,22 @@ const BottomSheet = ({
     }
   };
 
-  // 🔥 CHECK BOLEH DRAG ATAU TIDAK
-  const canDrag = (deltaY: number) => {
-    const el = contentRef.current;
-    if (!el) return true;
-
-    const isAtTop = el.scrollTop === 0;
-    const isAtBottom = el.scrollHeight - el.scrollTop === el.clientHeight;
-
-    // kalau tarik ke bawah & sudah di atas → boleh drag
-    if (deltaY < 0 && isAtTop) return true;
-
-    // kalau tarik ke atas & sudah di bawah → boleh drag
-    if (deltaY > 0 && isAtBottom) return true;
-
-    return false;
-  };
-
-  // ✅ START DRAG
-  const dragStart = (e: any) => {
+  // ✅ START DRAG (beda source)
+  const dragStart = (e: any, source: "header" | "content") => {
+    dragSource.current = source;
     isTouching.current = true;
     startY.current = e.pageY || e.touches?.[0].pageY;
     startHeight.current = height;
+  };
+
+  // ✅ cek drag dari content
+  const canDragFromContent = (deltaY: number) => {
+    const el = contentRef.current;
+    if (!el) return true;
+
+    const isAtTop = el.scrollTop <= 0;
+
+    return deltaY < 0 && isAtTop;
   };
 
   // ✅ DRAG MOVE + SNAP
@@ -86,12 +83,13 @@ const BottomSheet = ({
       const currentY = e.pageY || e.touches?.[0].pageY;
       const delta = startY.current - currentY;
 
-      // 🔥 kalau belum dragging, cek threshold dulu
       if (!isDragging) {
         if (Math.abs(delta) < DRAG_THRESHOLD) return;
 
-        // cek boleh drag atau tidak (biar scroll tetap jalan)
-        if (!canDrag(delta)) return;
+        // 🔥 logic utama
+        if (dragSource.current === "content") {
+          if (!canDragFromContent(delta)) return;
+        }
 
         setIsDragging(true);
       }
@@ -175,28 +173,36 @@ const BottomSheet = ({
 
       {/* SHEET */}
       <div
-        onMouseDown={dragStart}
-        onTouchStart={dragStart}
         style={{
           height: `${height}vh`,
           transform: open ? "translateY(0%)" : "translateY(100%)",
         }}
-        className={`absolute bottom-0 left-0 w-full bg-white rounded-t-2xl shadow-xl transition-all duration-300 ${
+        className={`absolute bottom-0 left-0 w-full flex flex-col bg-white rounded-t-2xl shadow-xl transition-all duration-300 ${
           isDragging ? "transition-none" : ""
         } ${height === 100 ? "rounded-none" : ""}`}
       >
-        <div className="flex flex-col items-center py-4 px-6">
-          {/* HANDLE */}
+        {/* HEADER (always drag) */}
+        <div
+          onMouseDown={(e) => dragStart(e, "header")}
+          onTouchStart={(e) => dragStart(e, "header")}
+          className="flex flex-col items-center py-4 px-6 cursor-grab active:cursor-grabbing"
+        >
           <div className="w-10 h-1 bg-gray-300 rounded-full mb-3" />
 
-          {/* TITLE */}
           {title && (
             <h2 className="text-md font-semibold text-center text-gray-700">
               {title}
             </h2>
           )}
         </div>
-        <div ref={contentRef} className="h-full overflow-y-auto px-6 pb-10">
+
+        {/* CONTENT */}
+        <div
+          ref={contentRef}
+          onMouseDown={(e) => dragStart(e, "content")}
+          onTouchStart={(e) => dragStart(e, "content")}
+          className="flex-1 overflow-y-auto px-6 pb-10 min-h-0 overscroll-contain"
+        >
           {children}
         </div>
       </div>

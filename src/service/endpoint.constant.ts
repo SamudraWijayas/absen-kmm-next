@@ -10,7 +10,7 @@ const endpoint = {
   MESSAGE: "/messages",
   CONVERSATION: "/conversations",
   GENERUS: "/generus",
-  PUSH: "/push"
+  SAVETOKEN: "/save-token"
 };
 
 export default endpoint;

@@ -168,76 +168,74 @@ const Setting = ({
             <div className="flex justify-center items-center">
               <div className="flex flex-col justify-center items-center">
                 {conversation ? (
-                  <div className="flex justify-center">
-                    <div className="relative group w-fit">
-                      {/* Image */}
-                      <Image
-                        src={preview || photoSrc || "/images/profile.jpg"}
-                        alt="avatar"
-                        width={200}
-                        height={200}
-                        className="w-26 h-26 object-cover rounded-full"
+                  <div className="relative w-fit group">
+                    {/* Image */}
+                    <Image
+                      src={preview || photoSrc || "/images/profile.jpg"}
+                      alt="avatar"
+                      width={200}
+                      height={200}
+                      className="w-26 h-26 object-cover rounded-full"
+                      onClick={triggerFileSelect}
+                    />
+
+                    <Controller
+                      name="image"
+                      control={controlUpdatePicture}
+                      render={({ field: { onChange, value, ...field } }) => (
+                        <>
+                          <input
+                            {...field}
+                            ref={inputFileRef}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={onSelectNewAvatar}
+                          />
+                          {preview && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                handleDeletePicture(() => {
+                                  onChange(undefined);
+                                  resetUpdatePicture();
+                                });
+                              }}
+                              className="absolute cursor-pointer -bottom-2 -left-2 w-7 h-7 flex items-center justify-center rounded-full bg-red-500 text-white shadow-md hover:bg-red-700 transition-all"
+                            >
+                              <X size={14} />
+                            </button>
+                          )}
+                          {preview && (
+                            <button
+                              type="button"
+                              onClick={handleSubmitUpdatePicture(
+                                handleUpdateGrup,
+                              )}
+                              className="absolute cursor-pointer -bottom-2 -right-2 w-7 h-7 flex items-center justify-center rounded-full bg-blue-500 text-white shadow-md hover:bg-blue-700 transition-all"
+                            >
+                              <Check size={14} />
+                            </button>
+                          )}
+                        </>
+                      )}
+                    />
+                    {!preview && (
+                      <div
+                        className="absolute inset-0 rounded-full flex items-center text-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 cursor-pointer transition"
                         onClick={triggerFileSelect}
-                      />
+                      >
+                        <span className="text-white text-sm font-medium p-3">
+                          Change Photo
+                        </span>
+                      </div>
+                    )}
 
-                      <Controller
-                        name="image"
-                        control={controlUpdatePicture}
-                        render={({ field: { onChange, value, ...field } }) => (
-                          <>
-                            <input
-                              {...field}
-                              ref={inputFileRef}
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={onSelectNewAvatar}
-                            />
-                            {preview && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  handleDeletePicture(() => {
-                                    onChange(undefined);
-                                    resetUpdatePicture();
-                                  });
-                                }}
-                                className="absolute cursor-pointer -bottom-2 -left-2  w-7 h-7 flex items-center justify-center rounded-full bg-red-500 text-white shadow-md hover:bg-red-700 transition-all"
-                              >
-                                <X size={14} />
-                              </button>
-                            )}
-                            {preview && (
-                              <button
-                                type="button"
-                                onClick={handleSubmitUpdatePicture(
-                                  handleUpdateGrup,
-                                )}
-                                className="absolute cursor-pointer -bottom-2 -right-2 w-7 h-7 flex items-center justify-center rounded-full bg-blue-500 text-white shadow-md hover:bg-blue-700 transition-all"
-                              >
-                                <Check size={14} />
-                              </button>
-                            )}
-                          </>
-                        )}
-                      />
-                      {!preview && (
-                        <div
-                          className="absolute inset-0 rounded-full flex items-center text-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 cursor-pointer transition"
-                          onClick={triggerFileSelect}
-                        >
-                          <span className="text-white text-sm font-medium p-3">
-                            Change Photo
-                          </span>
-                        </div>
-                      )}
-
-                      {isPendingMutateUploadFile && (
-                        <div className="absolute bottom-0 right-0 bg-white text-xs px-2 py-1 rounded shadow">
-                          Uploading...
-                        </div>
-                      )}
-                    </div>
+                    {isPendingMutateUploadFile && (
+                      <div className="absolute bottom-0 right-0 bg-white text-xs px-2 py-1 rounded shadow">
+                        Uploading...
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <Image
@@ -318,6 +316,7 @@ const Setting = ({
                   return (
                     <div
                       key={theme.key}
+                      onClick={() => setActiveTheme(theme.key)}
                       className={`cursor-pointer w-full h-28 rounded-xl border-2 ${
                         isActive ? "border-primary" : "border-transparent"
                       } flex items-center justify-center transition`}

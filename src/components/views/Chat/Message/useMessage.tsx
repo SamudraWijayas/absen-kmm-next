@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import chatService from "@/service/chat.service";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
@@ -19,8 +19,15 @@ const useMessage = () => {
   const { dataProfile } = useProfile();
   const currentUserId = dataProfile?.id;
 
-  const { socket, startTyping, stopTyping, typingUsers, onlineUsers } =
-    useSocket();
+  const {
+    socket,
+    deleteForMe: socketDeleteForMe,
+    deleteForEveryone: socketDeleteForEveryone,
+    startTyping,
+    stopTyping,
+    typingUsers,
+    onlineUsers,
+  } = useSocket();
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // ================= GET MESSAGES =================
@@ -109,22 +116,38 @@ const useMessage = () => {
 
   // ================= SOCKET LISTENER =================
   useEffect(() => {
-    if (!socket || !id) return;
+    if (!socket || !id || !dataMessage || !currentUserId) return;
 
     // Gabung room
     socket.emit("join_room", id);
 
-    const handler = () => {
-      refetchMessage(); // fetch terbaru
+    const handleReceiveMessage = () => {
+      refetchMessage();
     };
 
-    socket.on("receive_message", handler);
+    const handleDeletedForMe = ({ messageId, userId }: { messageId: number; userId: number }) => {
+      if (userId === currentUserId) {
+        // Optimistically remove from local state
+        // Note: dataMessage is readonly from query, but for demo we can refetch or use queryClient
+        refetchMessage();
+      }
+    };
+
+    const handleDeletedForEveryone = ({ messageId }: { messageId: number }) => {
+      refetchMessage();
+    };
+
+    socket.on("receive_message", handleReceiveMessage);
+    socket.on("message_deleted_for_me", handleDeletedForMe);
+    socket.on("message_deleted_for_everyone", handleDeletedForEveryone);
 
     return () => {
-      socket.off("receive_message", handler);
+      socket.off("receive_message", handleReceiveMessage);
+      socket.off("message_deleted_for_me", handleDeletedForMe);
+      socket.off("message_deleted_for_everyone", handleDeletedForEveryone);
       socket.emit("leave_room", id);
     };
-  }, [socket, id, refetchMessage]);
+  }, [socket, id, refetchMessage, dataMessage, currentUserId]);
 
   const handleTyping = () => {
     if (!id) return;
@@ -138,6 +161,25 @@ const useMessage = () => {
     typingTimeoutRef.current = setTimeout(() => {
       stopTyping(id);
     }, 1500);
+  };
+
+  const [activeDropdownId, setActiveDropdownId] = useState<number | null>(null);
+
+  const toggleDropdown = (messageId: number) => {
+    if (activeDropdownId === messageId) setActiveDropdownId(null);
+    else setActiveDropdownId(messageId);
+  };
+
+  // delete -----------------------------------
+
+  const handleDeleteForMe = (messageId: number) => {
+    socketDeleteForMe(messageId);
+    setActiveDropdownId(null);
+  };
+
+  const handleDeleteForEveryone = (messageId: number) => {
+    socketDeleteForEveryone(messageId);
+    setActiveDropdownId(null);
   };
 
   return {
@@ -154,6 +196,11 @@ const useMessage = () => {
     typingUsers,
     handleTyping,
     onlineUsers,
+
+    toggleDropdown,
+    activeDropdownId,
+    handleDeleteForMe,
+    handleDeleteForEveryone,
   };
 };
 

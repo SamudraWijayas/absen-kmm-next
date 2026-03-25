@@ -25,6 +25,11 @@ const chatService = {
     instance.delete(`${endpoint.CONVERSATION}/${conversationId}`),
   updateConversations: (conversationId: string, payload: IConvertation) =>
     instance.patch(`${endpoint.CONVERSATION}/group/${conversationId}`, payload),
+
+  deleteForMe: (messageId: number) =>
+    instance.post(`${endpoint.MESSAGE}/delete_for_me`, { messageId }),
+  deleteForEveryone: (messageId: number) =>
+    instance.post(`${endpoint.MESSAGE}/delete_for_everyone`, { messageId }),
 };
 
 export default chatService;

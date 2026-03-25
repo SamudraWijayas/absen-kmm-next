@@ -84,6 +84,8 @@ interface SocketContextType {
   startTyping: (conversationId: string) => void;
   stopTyping: (conversationId: string) => void;
   markAsRead: (conversationId: string) => void;
+  deleteForMe: (messageId: number) => void; // ✅ baru
+  deleteForEveryone: (messageId: number) => void; // ✅ baru
 }
 
 const SocketContext = createContext<SocketContextType>({
@@ -96,6 +98,8 @@ const SocketContext = createContext<SocketContextType>({
   startTyping: () => {},
   stopTyping: () => {},
   markAsRead: () => {},
+  deleteForMe: () => {}, // ✅ default
+  deleteForEveryone: () => {}, // ✅ default
 });
 
 /* ===============================
@@ -119,9 +123,6 @@ export const SocketProvider = ({
     {},
   );
 
-  // ===============================
-  // DERIVED ONLINE USERS
-  // ===============================
   const onlineUsers = useMemo(() => {
     if (userId && socket.connected) {
       const copy = new Set(onlineUsersState);
@@ -135,13 +136,9 @@ export const SocketProvider = ({
     if (!userId) return;
 
     if (!socket.connected) socket.connect();
-
     socket.emit("register_user", userId);
 
-    /* ===============================
-       EVENT HANDLERS
-    ================================= */
-
+    // EVENT HANDLERS
     const handleOnlineUsersList = ({ users }: OnlineUsersListPayload) => {
       setOnlineUsersState(new Set(users));
     };
@@ -161,17 +158,12 @@ export const SocketProvider = ({
     const handleUserTyping = (data: TypingPayload) => {
       setTypingUsers((prev) => {
         const copy = { ...prev };
-
-        if (!copy[data.conversationId]) {
-          copy[data.conversationId] = new Set();
-        }
-
+        if (!copy[data.conversationId]) copy[data.conversationId] = new Set();
         if (data.isTyping) {
           copy[data.conversationId].add(data.userId);
         } else {
           copy[data.conversationId].delete(data.userId);
         }
-
         return { ...copy };
       });
     };
@@ -188,10 +180,21 @@ export const SocketProvider = ({
       console.log("Chat list updated:", data);
     };
 
-    /* ===============================
-       REGISTER EVENTS
-    ================================= */
+    const handleDeletedForMe = (data: {
+      messageId: number;
+      userId: number;
+    }) => {
+      console.log("Pesan dihapus untuk saya:", data);
+    };
 
+    const handleDeletedForEveryone = (data: {
+      messageId: number;
+      userId: number;
+    }) => {
+      console.log("Pesan dihapus untuk semua:", data);
+    };
+
+    // REGISTER EVENTS
     socket.on("online_users_list", handleOnlineUsersList);
     socket.on("user_online", handleUserOnline);
     socket.on("user_offline", handleUserOffline);
@@ -199,6 +202,8 @@ export const SocketProvider = ({
     socket.on("messages_read", handleMessagesRead);
     socket.on("receive_message", handleReceiveMessage);
     socket.on("chat_list_update", handleChatListUpdate);
+    socket.on("message_deleted_for_me", handleDeletedForMe); // ✅ baru
+    socket.on("message_deleted_for_everyone", handleDeletedForEveryone); // ✅ baru
 
     return () => {
       socket.off("online_users_list", handleOnlineUsersList);
@@ -208,53 +213,50 @@ export const SocketProvider = ({
       socket.off("messages_read", handleMessagesRead);
       socket.off("receive_message", handleReceiveMessage);
       socket.off("chat_list_update", handleChatListUpdate);
+      socket.off("message_deleted_for_me", handleDeletedForMe); // ✅
+      socket.off("message_deleted_for_everyone", handleDeletedForEveryone); // ✅
       socket.disconnect();
     };
   }, [userId, socket]);
 
-  /* ===============================
-     SOCKET ACTIONS
-  ================================= */
-
+  // SOCKET ACTIONS
   const joinRoom = useCallback(
-    (conversationId: string) => {
-      socket.emit("join_room", conversationId);
-    },
+    (conversationId: string) => socket.emit("join_room", conversationId),
     [socket],
   );
 
   const leaveRoom = useCallback(
-    (conversationId: string) => {
-      socket.emit("leave_room", conversationId);
-    },
+    (conversationId: string) => socket.emit("leave_room", conversationId),
     [socket],
   );
 
   const sendMessage = useCallback(
-    (data: SendMessagePayload) => {
-      socket.emit("send_message", data);
-    },
+    (data: SendMessagePayload) => socket.emit("send_message", data),
     [socket],
   );
 
   const startTyping = useCallback(
-    (conversationId: string) => {
-      socket.emit("typing_start", { conversationId });
-    },
+    (conversationId: string) => socket.emit("typing_start", { conversationId }),
     [socket],
   );
 
   const stopTyping = useCallback(
-    (conversationId: string) => {
-      socket.emit("typing_stop", { conversationId });
-    },
+    (conversationId: string) => socket.emit("typing_stop", { conversationId }),
     [socket],
   );
 
   const markAsRead = useCallback(
-    (conversationId: string) => {
-      socket.emit("mark_read", { conversationId });
-    },
+    (conversationId: string) => socket.emit("mark_read", { conversationId }),
+    [socket],
+  );
+
+  const deleteForMe = useCallback(
+    (messageId: number) => socket.emit("delete_for_me", { messageId }),
+    [socket],
+  );
+
+  const deleteForEveryone = useCallback(
+    (messageId: number) => socket.emit("delete_for_everyone", { messageId }),
     [socket],
   );
 
@@ -270,6 +272,8 @@ export const SocketProvider = ({
         startTyping,
         stopTyping,
         markAsRead,
+        deleteForMe, // ✅ tambahin di context
+        deleteForEveryone, // ✅ tambahin di context
       }}
     >
       {children}
