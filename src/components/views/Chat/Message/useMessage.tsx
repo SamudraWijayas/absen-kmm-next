@@ -117,7 +117,7 @@ const useMessage = () => {
 
   // ================= SOCKET LISTENER =================
   useEffect(() => {
-    if (!socket || !id || !dataMessage || !currentUserId) return;
+    if (!socket || !id || !currentUserId) return;
 
     // Gabung room
     socket.emit("join_room", id);

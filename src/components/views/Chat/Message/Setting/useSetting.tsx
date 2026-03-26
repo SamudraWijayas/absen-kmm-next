@@ -96,7 +96,6 @@ const useSetting = () => {
         }${preview}`
       : "";
 
-  console.log("Preview URL:", previewUrl);
 
   const handleUploadPicture = (
     files: FileList,

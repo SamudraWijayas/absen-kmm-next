@@ -85,7 +85,6 @@ const Message = ({ initialTheme }: Props) => {
     isLoadingMessage,
     dataConversation,
     control,
-    isRefetchingConversation,
     refetchConversation,
     handleSubmitForm,
     handleSendMessage,
