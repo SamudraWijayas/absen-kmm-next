@@ -1,6 +1,5 @@
 "use client";
 
-import AddGroup from "@/components/views/Chat/AddGroup/AddGroup";
 import AddPrivate from "@/components/views/Chat/AddPrivate/AddPrivate";
 import {
   Dropdown,
@@ -11,14 +10,15 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { EllipsisVertical, Search } from "lucide-react";
+import { Dispatch, SetStateAction } from "react";
 
 interface Proptypes {
   refetchChatList: () => void;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  setOpenPrivate: Dispatch<SetStateAction<boolean>>;
 }
 
-const NavBack = ({ refetchChatList }: Proptypes) => {
-  const addGroup = useDisclosure();
-  const addPrivate = useDisclosure();
+const NavBack = ({ setOpen, setOpenPrivate }: Proptypes) => {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/70 dark:bg-black/70  dark:border-gray-700 p-4 flex flex-col gap-2 md:gap-4">
       {/* Title */}
@@ -50,10 +50,10 @@ const NavBack = ({ refetchChatList }: Proptypes) => {
             </Button>
           </DropdownTrigger>
           <DropdownMenu aria-label="Actions">
-            <DropdownItem key="new" onPress={addGroup.onOpen}>
+            <DropdownItem key="new" onPress={() => setOpen(true)}>
               Tambah Grup
             </DropdownItem>
-            <DropdownItem key="friend" onPress={addPrivate.onOpen}>
+            <DropdownItem key="friend" onPress={() => setOpenPrivate(true)}>
               Tambah Teman
             </DropdownItem>
           </DropdownMenu>
@@ -67,8 +67,6 @@ const NavBack = ({ refetchChatList }: Proptypes) => {
         />
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
       </div>
-      <AddGroup {...addGroup} refetchChatList={refetchChatList} />
-      <AddPrivate {...addPrivate} refetchChatList={refetchChatList} />
     </div>
   );
 };

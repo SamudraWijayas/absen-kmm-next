@@ -21,7 +21,6 @@ import Setting from "./Setting/Setting";
 import { chatThemes } from "../../constants/chatThemes";
 import { motion } from "framer-motion";
 import BottomSheet from "@/components/ui/BottomSheet/BottomSheet";
-import { boolean } from "yup";
 
 interface Props {
   initialTheme: string;
@@ -320,10 +319,13 @@ const Message = ({ initialTheme }: Props) => {
                 const isCurrentUser = msg.senderId === currentUserId;
 
                 const date = new Date(msg.createdAt);
-                const time = `${date.getUTCHours().toString().padStart(2, "0")}:${date
-                  .getUTCMinutes()
-                  .toString()
-                  .padStart(2, "0")}`;
+
+                const time = date.toLocaleTimeString("id-ID", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                  timeZone: "Asia/Jakarta",
+                });
 
                 return (
                   <React.Fragment key={`${msg.id}-${index}`}>
@@ -563,7 +565,7 @@ const Message = ({ initialTheme }: Props) => {
         open={open}
         onOpenChange={setOpen}
         title="Settings"
-        snapPoints={[30, 60, 100]}
+        snapPoints={[30, 60, 80, 100]}
         initialHeight={98}
       >
         <Setting

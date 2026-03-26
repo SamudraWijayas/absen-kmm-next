@@ -1,14 +1,15 @@
 import chatService from "@/service/chat.service";
 import useChangeUrl from "@/hooks/useChangeUrls";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect } from "react";
 import { useSocket } from "@/contexts/SocketProvider";
 import { ToasterContext } from "@/contexts/ToasterContext";
 
 const useChat = () => {
   const { setToaster } = useContext(ToasterContext);
+  const queryClient = useQueryClient();
   const { currentSearch } = useChangeUrl();
-  const { socket, onlineUsers, } = useSocket();
+  const { socket, onlineUsers } = useSocket();
   const getChatList = async () => {
     let params = ``;
     if (currentSearch) {
@@ -65,6 +66,8 @@ const useChat = () => {
         type: "success",
         message: "Berhasil Hapus Percakapan",
       });
+
+      queryClient.invalidateQueries({ queryKey: ["ChatList"] });
     },
   });
 

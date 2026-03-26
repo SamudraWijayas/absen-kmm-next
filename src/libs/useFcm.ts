@@ -3,9 +3,13 @@
 import { useEffect } from "react";
 import { getFcmToken } from "./getFcmToken";
 import apiServices from "@/service/api.service";
+import { useSession } from "next-auth/react";
 
 const useFcm = () => {
+  const { status } = useSession();
   useEffect(() => {
+    const isLoggedIn = status === "authenticated";
+    if (!isLoggedIn) return;  
     const init = async () => {
       try {
         // 1️⃣ Ambil token FCM

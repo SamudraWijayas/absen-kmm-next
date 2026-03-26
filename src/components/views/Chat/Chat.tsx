@@ -1,16 +1,37 @@
 "use client";
 
 import HeadChat from "@/components/ui/HeadChat";
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import useChat from "./useChat";
 import { IChat } from "@/types/Chat";
 import { Skeleton } from "@heroui/react";
 import ChatItem from "./ChatItem";
 import BottomSheet from "@/components/ui/BottomSheet/BottomSheet";
+import AddGroup from "./AddGroup/AddGroup";
+import useProfile from "@/hooks/useProfile";
+import AddPrivate from "./AddPrivate/AddPrivate";
 
 const Chat = () => {
-  const { dataChatList, isLoadingChatList, onlineUsers, refetchChatList } =
-    useChat();
+  const [open, setOpen] = useState(false);
+  const [openPrivate, setOpenPrivate] = useState(false);
+  const { dataProfile } = useProfile();
+  const {
+    dataChatList,
+    isLoadingChatList,
+    onlineUsers,
+    refetchChatList,
+    mutateDeleteConversation,
+  } = useChat();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const handleDelete = (id: string) => {
+    setDeletingId(id);
+
+    mutateDeleteConversation(id, {
+      onSettled: () => {
+        setDeletingId(null);
+      },
+    });
+  };
 
   const chatList: IChat[] = Array.isArray(dataChatList?.data)
     ? dataChatList.data
@@ -18,7 +39,7 @@ const Chat = () => {
 
   return (
     <Fragment>
-      <HeadChat refetchChatList={refetchChatList} />
+      <HeadChat refetchChatList={refetchChatList} setOpen={setOpen} setOpenPrivate={setOpenPrivate} />
 
       <div className="px-4 lg:pt-17.5 pt-32 min-h-screen bg-white dark:bg-black/10">
         <div>
@@ -47,7 +68,9 @@ const Chat = () => {
                 key={chat.conversationId}
                 chat={chat}
                 onlineUsers={onlineUsers}
-                refetchChatList={refetchChatList}
+                onDelete={mutateDeleteConversation}
+                isDeleting={deletingId === chat.conversationId}
+                currentUserId={dataProfile?.id}
               />
             ))
           ) : (
@@ -57,6 +80,31 @@ const Chat = () => {
           )}
         </div>
       </div>
+      <BottomSheet
+        open={open}
+        onOpenChange={setOpen}
+        title="Tambah Grup"
+        snapPoints={[30, 60, 75, 100]}
+        initialHeight={100}
+      >
+        <AddGroup
+          onClose={() => setOpen(false)}
+          refetchChatList={refetchChatList}
+        />
+      </BottomSheet>
+
+      <BottomSheet
+        open={openPrivate}
+        onOpenChange={setOpenPrivate}
+        title="Tambah Teman Ngobrol"
+        snapPoints={[30, 60, 75, 100]}
+        initialHeight={100}
+      >
+        <AddPrivate
+          onClose={() => setOpenPrivate(false)}
+          refetchChatList={refetchChatList}
+        />
+      </BottomSheet>
     </Fragment>
   );
 };

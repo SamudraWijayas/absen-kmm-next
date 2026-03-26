@@ -3,36 +3,23 @@ import { animate, motion, useMotionValue } from "framer-motion";
 import { Trash } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import useChat from "./useChat";
-import useProfile from "@/hooks/useProfile";
-import { Avatar, Spinner } from "@heroui/react";
+import { useState } from "react";
+import { Avatar, cn, Spinner } from "@heroui/react";
 
 interface Proptypes {
   chat: IChat;
   onlineUsers: Set<number>;
-  refetchChatList: () => void;
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
+  currentUserId?: string;
 }
 
 const ChatItem = (props: Proptypes) => {
-  const { chat, onlineUsers, refetchChatList } = props;
-  const { dataProfile } = useProfile();
-  const currentUserId = dataProfile?.id;
-  const {
-    mutateDeleteConversation,
-    isPendingMutateDeleteConversation,
-    isSuccessMutateDeleteConversation,
-  } = useChat();
+  const { chat, onlineUsers, onDelete, isDeleting, currentUserId } = props;
 
   const x = useMotionValue(0);
   const DELETE_WIDTH = 90;
   const [isDragging, setIsDragging] = useState(false);
-
-  useEffect(() => {
-    if (isSuccessMutateDeleteConversation) {
-      refetchChatList();
-    }
-  }, [isSuccessMutateDeleteConversation, refetchChatList]);
 
   let name = "";
   let avatar = "/profil.jpg";
@@ -73,10 +60,13 @@ const ChatItem = (props: Proptypes) => {
   const isOnline = userId ? onlineUsers.has(userId) : false;
 
   const date = new Date(chat.createdAt);
-  const time = `${date.getUTCHours().toString().padStart(2, "0")}:${date
-    .getUTCMinutes()
-    .toString()
-    .padStart(2, "0")}`;
+
+  const time = date.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Jakarta",
+  });
 
   return (
     <div className="relative overflow-hidden rounded-xl mb-2">
@@ -86,14 +76,10 @@ const ChatItem = (props: Proptypes) => {
         style={{ width: DELETE_WIDTH }}
       >
         <button
-          onClick={() => mutateDeleteConversation(id || "")}
+          onClick={() => onDelete(id || "")}
           className="text-red-600 bg-red-100 p-4 rounded-2xl font-semibold"
         >
-          {isPendingMutateDeleteConversation ? (
-            <Spinner size="sm" color="white" />
-          ) : (
-            <Trash />
-          )}
+          {isDeleting ? <Spinner size="sm" color="white" /> : <Trash />}
         </button>
       </div>
 
@@ -176,8 +162,15 @@ const ChatItem = (props: Proptypes) => {
 
             <div className="flex flex-col">
               <span className="font-medium">{name}</span>
-              <span className="text-gray-500 text-sm truncate">
-                {lastMessage}
+              <span
+                className={cn(
+                  "text-gray-500 text-sm truncate",
+                  chat.lastMessageIsDeleted && "italic",
+                )}
+              >
+                {chat.lastMessageIsDeleted
+                  ? "Pesan telah dihapus"
+                  : lastMessage}
               </span>
             </div>
           </div>

@@ -108,7 +108,7 @@ const Account = () => {
           </div>
         </div>
       </div>
-      <div className="w-full min-h-25">
+      <div className="w-full min-h-25 mt-10">
         <AdBanner
           dataAdFormat="auto"
           dataFullWidthResponsive={true}

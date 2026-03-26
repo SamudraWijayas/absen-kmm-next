@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import chatService from "@/service/chat.service";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { ISendMessage } from "@/types/Chat";
+import { IMessage, ISendMessage } from "@/types/Chat";
 import { useSocket } from "@/contexts/SocketProvider";
 import useProfile from "@/hooks/useProfile";
 
@@ -18,6 +18,7 @@ const useMessage = () => {
   const id = params?.id as string;
   const { dataProfile } = useProfile();
   const currentUserId = dataProfile?.id;
+  const queryClient = useQueryClient();
 
   const {
     socket,
@@ -121,22 +122,43 @@ const useMessage = () => {
     // Gabung room
     socket.emit("join_room", id);
 
-    const handleReceiveMessage = () => {
-      refetchMessage();
+    const handleReceiveMessage = (msg: IMessage) => {
+      queryClient.setQueryData<{ data: IMessage[] }>(
+        ["messages", id],
+        (old) => ({
+          data: old?.data ? [...old.data, msg] : [msg],
+        }),
+      );
     };
 
-    const handleDeletedForMe = ({ messageId, userId }: { messageId: number; userId: number }) => {
+    const handleDeletedForMe = ({
+      messageId,
+      userId,
+    }: {
+      messageId: number;
+      userId: number;
+    }) => {
       if (userId === currentUserId) {
-        // Optimistically remove from local state
-        // Note: dataMessage is readonly from query, but for demo we can refetch or use queryClient
-        refetchMessage();
+        queryClient.setQueryData<{ data: IMessage[] }>(
+          ["messages", id],
+          (old) => ({
+            data: old?.data.filter((m) => m.id !== messageId) ?? [],
+          }),
+        );
       }
     };
 
     const handleDeletedForEveryone = ({ messageId }: { messageId: number }) => {
-      refetchMessage();
+      queryClient.setQueryData<{ data: IMessage[] }>(
+        ["messages", id],
+        (old) => ({
+          data:
+            old?.data.map((m) =>
+              m.id === messageId ? { ...m, isDeleted: true } : m,
+            ) ?? [],
+        }),
+      );
     };
-
     socket.on("receive_message", handleReceiveMessage);
     socket.on("message_deleted_for_me", handleDeletedForMe);
     socket.on("message_deleted_for_everyone", handleDeletedForEveryone);

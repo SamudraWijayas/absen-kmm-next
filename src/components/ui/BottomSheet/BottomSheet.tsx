@@ -25,19 +25,30 @@ const BottomSheet = ({
   const [height, setHeight] = useState(initialHeight);
   const [isDragging, setIsDragging] = useState(false);
 
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
   const isTouching = useRef(false);
   const startY = useRef(0);
   const startHeight = useRef(initialHeight);
+  const currentHeight = useRef(initialHeight);
   const dragSource = useRef<"header" | "content" | null>(null);
+  const frame = useRef<number | null>(null);
 
   const DRAG_THRESHOLD = 10;
-
-  const contentRef = useRef<HTMLDivElement>(null);
 
   // ✅ sync open
   useEffect(() => {
     if (open) {
-      setHeight(initialHeight);
+      requestAnimationFrame(() => {
+        setHeight(initialHeight);
+        currentHeight.current = initialHeight;
+
+        if (sheetRef.current) {
+          sheetRef.current.style.height = `${initialHeight}vh`;
+        }
+      });
+
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -51,18 +62,16 @@ const BottomSheet = ({
     onClose?.();
 
     if (window.history.state?.bottomSheet) {
-      setTimeout(() => {
-        window.history.back();
-      }, 0);
+      setTimeout(() => window.history.back(), 0);
     }
   };
 
-  // ✅ START DRAG (beda source)
+  // ✅ START DRAG
   const dragStart = (e: any, source: "header" | "content") => {
     dragSource.current = source;
     isTouching.current = true;
     startY.current = e.pageY || e.touches?.[0].pageY;
-    startHeight.current = height;
+    startHeight.current = currentHeight.current;
   };
 
   // ✅ cek drag dari content
@@ -75,7 +84,7 @@ const BottomSheet = ({
     return deltaY < 0 && isAtTop;
   };
 
-  // ✅ DRAG MOVE + SNAP
+  // ✅ DRAG LOGIC (SUPER SMOOTH)
   useEffect(() => {
     const handleMove = (e: any) => {
       if (!isTouching.current) return;
@@ -86,7 +95,6 @@ const BottomSheet = ({
       if (!isDragging) {
         if (Math.abs(delta) < DRAG_THRESHOLD) return;
 
-        // 🔥 logic utama
         if (dragSource.current === "content") {
           if (!canDragFromContent(delta)) return;
         }
@@ -97,7 +105,17 @@ const BottomSheet = ({
       const newHeight =
         startHeight.current + (delta / window.innerHeight) * 100;
 
-      setHeight(Math.max(0, Math.min(100, newHeight)));
+      const clamped = Math.max(0, Math.min(100, newHeight));
+
+      if (frame.current) cancelAnimationFrame(frame.current);
+
+      frame.current = requestAnimationFrame(() => {
+        currentHeight.current = clamped;
+
+        if (sheetRef.current) {
+          sheetRef.current.style.height = `${clamped}vh`;
+        }
+      });
     };
 
     const handleUp = () => {
@@ -109,18 +127,26 @@ const BottomSheet = ({
 
       setIsDragging(false);
 
-      setHeight((prev) => {
-        if (prev < 20) {
-          hideBottomSheet();
-          return prev;
-        }
+      let finalHeight = currentHeight.current;
+      let shouldClose = false;
 
-        const closest = snapPoints.reduce((p, c) =>
-          Math.abs(c - prev) < Math.abs(p - prev) ? c : p,
+      if (finalHeight < 20) {
+        shouldClose = true;
+      } else {
+        finalHeight = snapPoints.reduce((p, c) =>
+          Math.abs(c - finalHeight) < Math.abs(p - finalHeight) ? c : p,
         );
+      }
 
-        return closest;
-      });
+      if (sheetRef.current) {
+        sheetRef.current.style.height = `${finalHeight}vh`;
+      }
+
+      setHeight(finalHeight);
+
+      if (shouldClose) {
+        hideBottomSheet();
+      }
     };
 
     document.addEventListener("mousemove", handleMove);
@@ -135,6 +161,9 @@ const BottomSheet = ({
       document.removeEventListener("mouseup", handleUp);
       document.removeEventListener("touchmove", handleMove);
       document.removeEventListener("touchend", handleUp);
+
+      if (frame.current) cancelAnimationFrame(frame.current);
+
       document.body.style.userSelect = "auto";
     };
   }, [isDragging, snapPoints]);
@@ -158,7 +187,7 @@ const BottomSheet = ({
     return () => {
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [open]);
+  }, [onClose, onOpenChange, open]);
 
   return (
     <div
@@ -173,27 +202,39 @@ const BottomSheet = ({
 
       {/* SHEET */}
       <div
+        ref={sheetRef}
         style={{
           height: `${height}vh`,
-          transform: open ? "translateY(0%)" : "translateY(100%)",
+          transform: open ? "translate3d(0,0,0)" : "translate3d(0,100%,0)",
         }}
-        className={`absolute bottom-0 left-0 w-full flex flex-col bg-white rounded-t-2xl shadow-xl transition-all duration-300 ${
+        className={`absolute bottom-0 left-0 w-full flex flex-col bg-white dark:bg-black rounded-t-2xl shadow-xl will-change-[height] transition-transform duration-300 ${
           isDragging ? "transition-none" : ""
         } ${height === 100 ? "rounded-none" : ""}`}
       >
-        {/* HEADER (always drag) */}
+        {/* HEADER */}
         <div
           onMouseDown={(e) => dragStart(e, "header")}
           onTouchStart={(e) => dragStart(e, "header")}
-          className="flex flex-col items-center py-4 px-6 cursor-grab active:cursor-grabbing"
+          className="relative flex flex-col items-center py-4 px-6 cursor-grab active:cursor-grabbing select-none"
         >
           <div className="w-10 h-1 bg-gray-300 rounded-full mb-3" />
 
-          {title && (
-            <h2 className="text-md font-semibold text-center text-gray-700">
-              {title}
-            </h2>
-          )}
+          <div className="flex justify-between w-full">
+            {title && (
+              <h2 className="text-md font-semibold text-black dark:text-white">
+                {title}
+              </h2>
+            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                hideBottomSheet();
+              }}
+              className="text-black dark:text-white font-semibold text-xl"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* CONTENT */}
@@ -201,6 +242,9 @@ const BottomSheet = ({
           ref={contentRef}
           onMouseDown={(e) => dragStart(e, "content")}
           onTouchStart={(e) => dragStart(e, "content")}
+          style={{
+            touchAction: isDragging ? "none" : "auto",
+          }}
           className="flex-1 overflow-y-auto px-6 pb-10 min-h-0 overscroll-contain"
         >
           {children}

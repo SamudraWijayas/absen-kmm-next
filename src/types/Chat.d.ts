@@ -32,6 +32,7 @@ interface IPersonalChat {
   conversationId: string;
   user: IUser;
   lastMessage: string | null;
+  lastMessageIsDeleted: boolean;
   lastMessageSender: {
     id: string;
   };
@@ -45,6 +46,7 @@ interface IGroupChat {
   name: string;
   image: string | null;
   lastMessage: string | null;
+  lastMessageIsDeleted: boolean;
   lastMessageSender: {
     id: string;
   };
