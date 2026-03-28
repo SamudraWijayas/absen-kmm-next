@@ -13,7 +13,7 @@ const schema = yup.object().shape({
   content: yup.string().required("Please input message"),
 });
 
-const useMessage = () => {
+const useMessage = (onJoined?: () => void) => {
   const params = useParams();
   const id = params?.id as string;
   const { dataProfile } = useProfile();
@@ -92,8 +92,10 @@ const useMessage = () => {
   // });
 
   const handleSendMessage = (data: ISendMessage) => {
-    if (!socket) return;
-
+    if (!socket || !socket.connected || !id) {
+      console.log("Socket belum siap");
+      return;
+    }
     socket.emit("send_message", {
       ...data,
       conversationId: id,
@@ -120,7 +122,7 @@ const useMessage = () => {
     if (!socket || !id || !currentUserId) return;
 
     // Gabung room
-    socket.emit("join_room", id);
+    // socket.emit("join_room", id);
 
     const handleReceiveMessage = (msg: IMessage) => {
       queryClient.setQueryData<{ data: IMessage[] }>(
@@ -167,9 +169,34 @@ const useMessage = () => {
       socket.off("receive_message", handleReceiveMessage);
       socket.off("message_deleted_for_me", handleDeletedForMe);
       socket.off("message_deleted_for_everyone", handleDeletedForEveryone);
-      socket.emit("leave_room", id);
+      // socket.emit("leave_room", id);
     };
-  }, [socket, id, refetchMessage, dataMessage, currentUserId]);
+  }, [socket, id, currentUserId]);
+
+  useEffect(() => {
+    if (!socket || !id) return;
+
+    const joinRoom = () => {
+      console.log("JOIN ROOM:", id);
+      socket.emit("join_room", id);
+
+      // 🔥 alert disini
+      // alert("Berhasil join room: " + id);
+      if (onJoined) {
+        onJoined(); // 🔥 trigger dari sini
+      }
+    };
+
+    if (socket.connected) {
+      joinRoom();
+    }
+
+    socket.on("connect", joinRoom);
+
+    return () => {
+      socket.off("connect", joinRoom);
+    };
+  }, [socket, id]);
 
   const handleTyping = () => {
     if (!id) return;

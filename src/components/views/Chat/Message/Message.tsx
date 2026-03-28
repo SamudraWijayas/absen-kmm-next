@@ -21,6 +21,7 @@ import Setting from "./Setting/Setting";
 import { chatThemes } from "../../constants/chatThemes";
 import { motion } from "framer-motion";
 import BottomSheet from "@/components/ui/BottomSheet/BottomSheet";
+import { ToasterStandalone } from "@/components/ui/Toaster/Toaster";
 
 interface Props {
   initialTheme: string;
@@ -66,6 +67,7 @@ const Message = ({ initialTheme }: Props) => {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [activeTheme, setActiveTheme] = useState(initialTheme);
+  const [showToast, setShowToast] = useState(false);
   const [deletedMessages, setDeletedMessages] = useState<Set<number>>(
     new Set(),
   );
@@ -79,7 +81,9 @@ const Message = ({ initialTheme }: Props) => {
   }, [activeTheme]);
 
   const currentTheme = chatThemes[activeTheme];
-
+  const handleJoined = () => {
+    setShowToast(true);
+  };
   const {
     dataMessage,
     isLoadingMessage,
@@ -97,7 +101,8 @@ const Message = ({ initialTheme }: Props) => {
     handleDeleteForMe,
     handleDeleteForEveryone,
     activeDropdownId,
-  } = useMessage();
+  } = useMessage(handleJoined);
+
   const closeDropdown = () => toggleDropdown(-1); // atau id "kosong" yang tidak mungkin ada
   const params = useParams();
   const id = params?.id as string; // conversationId
@@ -236,7 +241,6 @@ const Message = ({ initialTheme }: Props) => {
                 className="w-full h-full object-cover"
               />
             </div>
-
             <div>
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">
                 {truncateText(chatName, 15)}
@@ -266,7 +270,7 @@ const Message = ({ initialTheme }: Props) => {
       </div>
       <div
         className={cn(
-          "px-4 pt-17.5 min-h-screen bg-white dark:bg-black/10",
+          "px-4 pt-17.5 h-dvh bg-white dark:bg-black/10",
           currentTheme.background,
         )}
       >
@@ -559,7 +563,12 @@ const Message = ({ initialTheme }: Props) => {
           </div>
         </div>
       </div>
-
+      <ToasterStandalone
+        type="success"
+        message="Berhasil terhubung ke chat"
+        show={showToast}
+        onClose={() => setShowToast(false)}
+      />
       <BottomSheet
         open={open}
         onOpenChange={setOpen}
