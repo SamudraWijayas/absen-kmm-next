@@ -19,7 +19,7 @@ import useProfile from "@/hooks/useProfile";
 import Emoji from "@/components/ui/Emoji/Emoji";
 import Setting from "./Setting/Setting";
 import { chatThemes } from "../../constants/chatThemes";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import BottomSheet from "@/components/ui/BottomSheet/BottomSheet";
 import { ToasterStandalone } from "@/components/ui/Toaster/Toaster";
 
@@ -308,198 +308,227 @@ const Message = ({ initialTheme }: Props) => {
               })}
             </div>
           ) : (
-            <div
-              ref={scrollRef}
-              className="flex flex-col space-y-3 pt-4 lg:pb-15 pb-15 overflow-y-auto h-[calc(100vh-5rem)] scrollbar-hide "
-            >
-              {messages.map((msg: IMessage, index: number) => {
-                const previousMessage = messages[index - 1];
-                const showDateSeparator = isDifferentDay(
-                  msg.createdAt,
-                  previousMessage?.createdAt,
-                );
+            <AnimatePresence initial={false}>
+              <div
+                ref={scrollRef}
+                className="flex flex-col space-y-3 pt-4 lg:pb-15 pb-15 overflow-y-auto h-[calc(100vh-5rem)] scrollbar-hide "
+              >
+                {messages.map((msg: IMessage, index: number) => {
+                  const previousMessage = messages[index - 1];
+                  const showDateSeparator = isDifferentDay(
+                    msg.createdAt,
+                    previousMessage?.createdAt,
+                  );
 
-                const isCurrentUser = msg.senderId === currentUserId;
+                  const isCurrentUser = msg.senderId === currentUserId;
 
-                const date = new Date(msg.createdAt);
+                  const date = new Date(msg.createdAt);
 
-                const time = date.toLocaleTimeString("id-ID", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                  timeZone: "Asia/Jakarta",
-                });
+                  const time = date.toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                    timeZone: "Asia/Jakarta",
+                  });
 
-                return (
-                  <React.Fragment key={`${msg.id}-${index}`}>
-                    {showDateSeparator && (
-                      <div className="flex justify-center my-4">
-                        <span className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs px-4 py-1 rounded-full">
-                          {formatDateSeparator(msg.createdAt)}
-                        </span>
-                      </div>
-                    )}
-
-                    <div
-                      className={`flex items-end gap-2 ${
-                        isCurrentUser ? "justify-end" : "justify-start"
-                      }`}
-                    >
-                      {/* Avatar kiri */}
-                      {!isCurrentUser && (
-                        <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-400">
-                          <Image
-                            src={
-                              msg.sender.foto
-                                ? `${process.env.NEXT_PUBLIC_IMAGE}${msg.sender.foto}`
-                                : "/profil.jpg"
-                            }
-                            alt={msg.sender.nama}
-                            width={32}
-                            height={32}
-                            className="w-full h-full object-cover"
-                          />
+                  return (
+                    <React.Fragment key={`${msg.id}-${index}`}>
+                      {showDateSeparator && (
+                        <div className="flex justify-center my-4">
+                          <span className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs px-4 py-1 rounded-full">
+                            {formatDateSeparator(msg.createdAt)}
+                          </span>
                         </div>
                       )}
 
-                      {/* Chat bubble wrapper */}
-                      <div
-                        className={cn(
-                          "max-w-[70%] px-4 py-2 rounded-2xl shadow wrap-break-words relative group", // ⬅️ tambahkan 'group'
-                          isCurrentUser
-                            ? `${currentTheme.bubbleMe} rounded-br-none`
-                            : `${currentTheme.bubbleOther} rounded-bl-none`,
-                        )}
-                        onTouchStart={() =>
-                          isCurrentUser && handleLongPressStart(msg.id)
-                        }
-                        onTouchEnd={handleLongPressEnd}
-                        onMouseLeave={handleLongPressEnd}
+                      <motion.div
+                        layout
+                        initial={{
+                          opacity: 0,
+                          y: 10,
+                          x: isCurrentUser ? 50 : -50,
+                          scale: 0.95,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          y: 0,
+                          x: 0,
+                          scale: 1,
+                        }}
+                        exit={{
+                          opacity: 0,
+                          scale: 0.9,
+                        }}
+                        transition={{
+                          duration: 0.25,
+                          ease: "easeOut",
+                        }}
+                        className={`flex items-end gap-2 ${
+                          isCurrentUser ? "justify-end" : "justify-start"
+                        }`}
                       >
+                        {/* Avatar kiri */}
                         {!isCurrentUser && (
-                          <div className="text-xs font-medium text-gray-500 mb-1">
-                            {msg.sender.nama}
+                          <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-400">
+                            <Image
+                              src={
+                                msg.sender.foto
+                                  ? `${process.env.NEXT_PUBLIC_IMAGE}${msg.sender.foto}`
+                                  : "/profil.jpg"
+                              }
+                              alt={msg.sender.nama}
+                              width={32}
+                              height={32}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
                         )}
-                        {activeDropdownId === msg.id && (
-                          <div
-                            id={`dropdown-${msg.id}`}
-                            className="absolute right-0 w-46 p-2 bg-white rounded-xl dark:bg-gray-800 shadow-md  z-50 border border-gray-200 dark:border-gray-700"
-                          >
-                            <button
-                              onClick={() => handleDeleteForMe(msg.id)}
-                              className="w-full text-left px-2 py-2  hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-black"
-                            >
-                              Delete for me
-                            </button>
-                            <button
-                              onClick={() => handleDeleteForEveryone(msg.id)}
-                              className="w-full text-left px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-black"
-                            >
-                              Delete for everyone
-                            </button>
-                          </div>
-                        )}
-                        <div
-                          className={
-                            msg.isDeleted ? "italic text-gray-400" : ""
+
+                        {/* Chat bubble wrapper */}
+                        <motion.div
+                          layout
+                          whileTap={{ scale: 0.96 }}
+                          className={cn(
+                            "max-w-[70%] px-4 py-2 rounded-2xl shadow wrap-break-words relative group", // ⬅️ tambahkan 'group'
+                            isCurrentUser
+                              ? `${currentTheme.bubbleMe} rounded-br-none`
+                              : `${currentTheme.bubbleOther} rounded-bl-none`,
+                          )}
+                          onTouchStart={() =>
+                            isCurrentUser && handleLongPressStart(msg.id)
                           }
+                          onTouchEnd={handleLongPressEnd}
+                          onMouseLeave={handleLongPressEnd}
                         >
-                          {msg.isDeleted ? "Pesan telah dihapus" : msg.content}
-                        </div>
-                        <div className="flex justify-end items-center mt-1 gap-1 text-xs">
-                          <span
+                          {!isCurrentUser && (
+                            <div className="text-xs font-medium text-gray-500 mb-1">
+                              {msg.sender.nama}
+                            </div>
+                          )}
+                          {activeDropdownId === msg.id && (
+                            <div
+                              id={`dropdown-${msg.id}`}
+                              className="absolute right-0 w-46 p-2 bg-white rounded-xl dark:bg-gray-800 shadow-md  z-50 border border-gray-200 dark:border-gray-700"
+                            >
+                              <button
+                                onClick={() => handleDeleteForMe(msg.id)}
+                                className="w-full text-left px-2 py-2  hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-black"
+                              >
+                                Delete for me
+                              </button>
+                              <button
+                                onClick={() => handleDeleteForEveryone(msg.id)}
+                                className="w-full text-left px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-black"
+                              >
+                                Delete for everyone
+                              </button>
+                            </div>
+                          )}
+                          <div
                             className={
-                              isCurrentUser ? "text-white/80" : "text-gray-400"
+                              msg.isDeleted ? "italic text-gray-400" : ""
                             }
                           >
-                            {time}
-                          </span>
-                          {isCurrentUser && (
+                            {msg.isDeleted
+                              ? "Pesan telah dihapus"
+                              : msg.content}
+                          </div>
+                          <div className="flex justify-end items-center mt-1 gap-1 text-xs">
                             <span
-                              className={cn(
-                                "text-xs",
-                                msg.reads && msg.reads.length > 0
-                                  ? "text-blue-400"
-                                  : "text-gray-400",
-                              )}
-                              title={
-                                msg.reads && msg.reads.length > 0
-                                  ? "Sudah dibaca"
-                                  : "Belum dibaca"
+                              className={
+                                isCurrentUser
+                                  ? "text-white/80"
+                                  : "text-gray-400"
                               }
                             >
-                              {msg.reads && msg.reads.length > 0 ? (
-                                <CheckCheck size={14} />
-                              ) : (
-                                <Check size={14} />
-                              )}
+                              {time}
                             </span>
-                          )}
-                        </div>
-
-                        {/* Desktop dropdown button, muncul hanya saat hover */}
-                        {isCurrentUser && (
-                          <button
-                            onClick={() => toggleDropdown(msg.id)}
-                            className={cn(
-                              "absolute top-1 right-1 p-1 text-gray-400 hover:text-gray-700 opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out",
-                              currentTheme.bubbleMe,
+                            {isCurrentUser && (
+                              <span
+                                className={cn(
+                                  "text-xs",
+                                  msg.reads && msg.reads.length > 0
+                                    ? "text-blue-400"
+                                    : "text-gray-400",
+                                )}
+                                title={
+                                  msg.reads && msg.reads.length > 0
+                                    ? "Sudah dibaca"
+                                    : "Belum dibaca"
+                                }
+                              >
+                                {msg.reads && msg.reads.length > 0 ? (
+                                  <CheckCheck size={14} />
+                                ) : (
+                                  <Check size={14} />
+                                )}
+                              </span>
                             )}
-                          >
-                            <ChevronDown />
-                          </button>
+                          </div>
+
+                          {/* Desktop dropdown button, muncul hanya saat hover */}
+                          {isCurrentUser && (
+                            <button
+                              onClick={() => toggleDropdown(msg.id)}
+                              className={cn(
+                                "absolute top-1 right-1 p-1 text-gray-400 hover:text-gray-700 opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out",
+                                currentTheme.bubbleMe,
+                              )}
+                            >
+                              <ChevronDown />
+                            </button>
+                          )}
+
+                          {/* Dropdown menu */}
+                        </motion.div>
+
+                        {/* Avatar kanan */}
+                        {isCurrentUser && (
+                          <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-400">
+                            <Image
+                              src={
+                                msg.sender.foto
+                                  ? `${process.env.NEXT_PUBLIC_IMAGE}${msg.sender.foto}`
+                                  : "/profil.jpg"
+                              }
+                              alt={msg.sender.nama}
+                              width={32}
+                              height={32}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
                         )}
-
-                        {/* Dropdown menu */}
-                      </div>
-
-                      {/* Avatar kanan */}
-                      {isCurrentUser && (
-                        <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-400">
-                          <Image
-                            src={
-                              msg.sender.foto
-                                ? `${process.env.NEXT_PUBLIC_IMAGE}${msg.sender.foto}`
-                                : "/profil.jpg"
-                            }
-                            alt={msg.sender.nama}
-                            width={32}
-                            height={32}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
+                      </motion.div>
+                    </React.Fragment>
+                  );
+                })}
+                {usersTyping.length > 0 && (
+                  <div className="flex px-4 pt-2">
+                    <div
+                      className={cn(
+                        "bg-white dark:bg-zinc-800 px-4 py-2 rounded-2xl rounded-bl-sm shadow-sm max-w-20",
+                        currentTheme.bubbleOther,
                       )}
-                    </div>
-                  </React.Fragment>
-                );
-              })}
-              {usersTyping.length > 0 && (
-                <div className="flex px-4 pt-2">
-                  <div
-                    className={cn(
-                      "bg-white dark:bg-zinc-800 px-4 py-2 rounded-2xl rounded-bl-sm shadow-sm max-w-20",
-                      currentTheme.bubbleOther,
-                    )}
-                  >
-                    <div className="flex items-center gap-1 h-4">
-                      {[0, 1, 2].map((i) => (
-                        <motion.span
-                          key={i}
-                          className="w-1.5 h-1.5 bg-gray-500 rounded-full"
-                          animate={{ y: [0, -4, 0] }}
-                          transition={{
-                            duration: 0.6,
-                            repeat: Infinity,
-                            delay: i * 0.2,
-                          }}
-                        />
-                      ))}
+                    >
+                      <div className="flex items-center gap-1 h-4">
+                        {[0, 1, 2].map((i) => (
+                          <motion.span
+                            key={i}
+                            className="w-1.5 h-1.5 bg-gray-500 rounded-full"
+                            animate={{ y: [0, -4, 0] }}
+                            transition={{
+                              duration: 0.6,
+                              repeat: Infinity,
+                              delay: i * 0.2,
+                            }}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </AnimatePresence>
           )}
         </div>
         <div className="fixed bottom-0 left-0 w-full">
