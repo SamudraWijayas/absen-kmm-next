@@ -36,7 +36,7 @@ const AdBanner = ({
     <div className="w-full min-h-25">
       {/* Fallback */}
       {!isAdPushed && (
-        <div className="w-full h-25 bg-gray-100 flex items-center justify-center text-sm text-gray-500">
+        <div className="w-full h-25 bg-gray-100 dark:bg-gray-900 flex items-center justify-center text-sm text-gray-500">
           Advertisement
         </div>
       )}

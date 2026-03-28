@@ -59,7 +59,7 @@ export const ToasterStandalone = ({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
           transition={{ duration: 0.3 }}
-          className="fixed bottom-10 left-1/2 transform -translate-x-1/2 flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white z-[9999]"
+          className="fixed bottom-20 left-1/2 w-[90%] max-w-sm transform -translate-x-1/2 flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white z-9999"
         >
           {getIcon()}
           <p className="font-medium">{message}</p>
