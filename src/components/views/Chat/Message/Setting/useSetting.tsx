@@ -137,7 +137,7 @@ const useSetting = () => {
     resetUpdatePicture,
     setValueUpdatePicture,
 
-    preview: previewUrl,
+    preview,
   };
 };
 

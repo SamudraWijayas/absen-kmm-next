@@ -25,7 +25,6 @@ const ChatItem = (props: Proptypes) => {
   let avatar = "/profil.jpg";
   let userId: number | null = null;
   const id: string = chat.conversationId;
-  const IMAGE_BASE = process.env.NEXT_PUBLIC_IMAGE || "";
 
   const getImageUrl = (path?: string) => {
     if (!path) return "/profil.jpg";
@@ -34,7 +33,7 @@ const ChatItem = (props: Proptypes) => {
 
     if (path === "/profil.jpg") return path;
 
-    return `${IMAGE_BASE}${path}`;
+    return `${path}`;
   };
 
   let lastMessage = chat.lastMessage || "";

@@ -120,7 +120,7 @@ const Homes = () => {
             <Image
               src={
                 dataProfile?.foto
-                  ? `${process.env.NEXT_PUBLIC_IMAGE}${dataProfile.foto}`
+                  ? `${dataProfile.foto}`
                   : "/profil.jpg"
               }
               alt="Profile"

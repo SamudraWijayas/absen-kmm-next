@@ -58,7 +58,7 @@ const AddGroup = ({ onClose, refetchChatList }: PropTypes) => {
         className="flex flex-col gap-4"
         onSubmit={handleSubmitForm(handleAddGroup)}
       >
-        <div className="sticky top-0 z-10 bg-white dark:bg-black pb-2">
+        <div className="sticky top-0 z-10 bg-white dark:bg-[#212121] pb-2">
           <button
             type="submit"
             className="rounded-lg border border-gray-300 bg-blue-600 dark:bg-white dark:text-black p-2 text-xs font-medium text-white hover:bg-blue-800 disabled:opacity-50"
@@ -74,7 +74,7 @@ const AddGroup = ({ onClose, refetchChatList }: PropTypes) => {
               <input
                 {...field}
                 placeholder="Nama Grup"
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-900 rounded-full focus:outline-none"
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-500/20 rounded-xl focus:outline-none"
               />
               {errors.name && (
                 <span className="mt-1 text-sm text-red-500">
@@ -130,7 +130,7 @@ const AddGroup = ({ onClose, refetchChatList }: PropTypes) => {
                   <Image
                     src={
                       mumi.foto
-                        ? `${process.env.NEXT_PUBLIC_IMAGE}${mumi.foto}`
+                        ? `${mumi.foto}`
                         : "/profil.jpg"
                     }
                     alt="image"

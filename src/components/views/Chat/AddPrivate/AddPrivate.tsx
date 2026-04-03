@@ -55,7 +55,7 @@ const AddGroup = (props: PropTypes) => {
         onSubmit={handleSubmitForm(handleAddPrivate)}
         className="flex flex-col gap-4"
       >
-        <div className="sticky top-0 z-10 bg-white dark:bg-black pb-2">
+        <div className="sticky top-0 z-10 bg-white dark:bg-[#212121] pb-2">
           <button
             type="submit"
             className="rounded-lg border border-gray-300 bg-blue-600 dark:bg-white dark:text-black p-2 text-xs font-medium text-white hover:bg-blue-800 disabled:opacity-50"
@@ -103,7 +103,7 @@ const AddGroup = (props: PropTypes) => {
                     <Image
                       src={
                         mumi.foto
-                          ? `${process.env.NEXT_PUBLIC_IMAGE}${mumi.foto}`
+                          ? `${mumi.foto}`
                           : "/profil.jpg"
                       }
                       alt="image"

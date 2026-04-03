@@ -84,7 +84,7 @@ const Chat = () => {
         open={open}
         onOpenChange={setOpen}
         title="Tambah Grup"
-        snapPoints={[30, 60, 75, 100]}
+        snapPoints={[100]}
         initialHeight={100}
       >
         <AddGroup
@@ -97,7 +97,7 @@ const Chat = () => {
         open={openPrivate}
         onOpenChange={setOpenPrivate}
         title="Tambah Teman Ngobrol"
-        snapPoints={[30, 60, 75, 100]}
+        snapPoints={[100]}
         initialHeight={100}
       >
         <AddPrivate

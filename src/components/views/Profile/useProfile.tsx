@@ -77,28 +77,69 @@ const useProfile = () => {
     name: "foto",
   });
   const fileUrl = getValuesUpdatePicture("foto");
-  const previewUrl =
-    typeof preview === "string"
-      ? `${
-          process.env.NEXT_PUBLIC_IMAGE || process.env.NEXT_PUBLIC_API
-        }${preview}`
-      : "";
+  // const fileUrl = getValuesUpdatePicture("foto");
+  // const previewUrl =
+  //   typeof preview === "string"
+  //     ? `${
+  //         process.env.NEXT_PUBLIC_IMAGE || process.env.NEXT_PUBLIC_API
+  //       }${preview}`
+  //     : "";
 
-  console.log("Preview URL:", previewUrl);
+  const MAX_SIZE = 1 * 1024 * 1024;
+  const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/heic"];
 
-  const handleUploadPicture = (
+  const handleUploadPicture = async (
     files: FileList,
-    onChange: (value: string | FileList | null | undefined) => void
+    onChange: (value: string | FileList | null | undefined) => void,
   ) => {
-    handleUploadFile(files, onChange, (fileUrl: string | undefined) => {
-      if (fileUrl) {
-        setValueUpdatePicture("foto", fileUrl);
-      }
-    });
+    if (!files || files.length === 0) return;
+
+    const file = files[0]; // ✅ pakai let
+
+    // ✅ VALIDASI TYPE DASAR
+    if (!file.type.startsWith("image/")) {
+      setToaster({
+        type: "error",
+        message: "File harus berupa gambar",
+      });
+      return;
+    }
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setToaster({
+        type: "error",
+        message: "Format harus PNG, JPG, atau HEIC",
+      });
+      return;
+    }
+
+    // ✅ VALIDASI SIZE (SETELAH CONVERT)
+    if (file.size > MAX_SIZE) {
+      setToaster({
+        type: "error",
+        message: "Ukuran gambar maksimal 3MB",
+      });
+      return;
+    }
+
+    // 🔥 CONVERT ke FileList baru
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+
+    // lanjut upload
+    handleUploadFile(
+      dataTransfer.files,
+      onChange,
+      (fileUrl: string | undefined) => {
+        if (fileUrl) {
+          setValueUpdatePicture("foto", fileUrl);
+        }
+      },
+    );
   };
 
   const handleDeletePicture = (
-    onChange: (files: FileList | undefined) => void
+    onChange: (files: FileList | undefined) => void,
   ) => {
     handleDeleteFile(fileUrl, () => onChange(undefined));
   };
@@ -121,7 +162,7 @@ const useProfile = () => {
     resetUpdatePicture,
     setValueUpdatePicture,
 
-    preview: previewUrl,
+    preview,
   };
 };
 

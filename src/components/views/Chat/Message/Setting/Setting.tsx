@@ -171,7 +171,11 @@ const Setting = ({
                   <div className="relative w-fit group">
                     {/* Image */}
                     <Image
-                      src={preview || photoSrc || "/images/profile.jpg"}
+                      src={
+                        (typeof preview === "string" ? preview : undefined) ||
+                        photoSrc ||
+                        "/images/profile.jpg"
+                      }
                       alt="avatar"
                       width={200}
                       height={200}
@@ -359,7 +363,7 @@ const Setting = ({
                   {participants?.map((p) => {
                     const isAdmin = p.mumi?.id === createdById;
                     const foto = p.mumi?.foto
-                      ? `${process.env.NEXT_PUBLIC_IMAGE}${p.mumi.foto}`
+                      ? `${p.mumi.foto}`
                       : "/profil.jpg";
 
                     return (
@@ -403,9 +407,7 @@ const Setting = ({
             <div className="flex flex-col gap-2">
               {/* nanti ganti dengan data user dari API */}
               {participants?.map((p) => {
-                const foto = p.mumi?.foto
-                  ? `${process.env.NEXT_PUBLIC_IMAGE}${p.mumi.foto}`
-                  : "/profil.jpg";
+                const foto = p.mumi?.foto ? `${p.mumi.foto}` : "/profil.jpg";
 
                 return (
                   <div

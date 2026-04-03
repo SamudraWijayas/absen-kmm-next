@@ -22,6 +22,7 @@ import { chatThemes } from "../../constants/chatThemes";
 import { motion, AnimatePresence } from "framer-motion";
 import BottomSheet from "@/components/ui/BottomSheet/BottomSheet";
 import { ToasterStandalone } from "@/components/ui/Toaster/Toaster";
+import Link from "next/link";
 
 interface Props {
   initialTheme: string;
@@ -156,7 +157,7 @@ const Message = ({ initialTheme }: Props) => {
     photoPath && photoPath.startsWith("http")
       ? photoPath
       : photoPath
-        ? `${process.env.NEXT_PUBLIC_IMAGE}${photoPath}`
+        ? `${photoPath}`
         : "/profil.jpg";
 
   const truncateText = (text: string, max: number) => {
@@ -226,12 +227,12 @@ const Message = ({ initialTheme }: Props) => {
         {/* Title */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.back()}
+            <Link
+              href="/chat"
               className="flex items-center gap-2 text-sm font-medium hover:opacity-80 transition cursor-pointer"
             >
               <ChevronLeft size={23} />
-            </button>
+            </Link>
             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200">
               <Image
                 src={photoSrc}
@@ -373,7 +374,7 @@ const Message = ({ initialTheme }: Props) => {
                             <Image
                               src={
                                 msg.sender.foto
-                                  ? `${process.env.NEXT_PUBLIC_IMAGE}${msg.sender.foto}`
+                                  ? `${msg.sender.foto}`
                                   : "/profil.jpg"
                               }
                               alt={msg.sender.nama}
@@ -488,7 +489,7 @@ const Message = ({ initialTheme }: Props) => {
                             <Image
                               src={
                                 msg.sender.foto
-                                  ? `${process.env.NEXT_PUBLIC_IMAGE}${msg.sender.foto}`
+                                  ? `${msg.sender.foto}`
                                   : "/profil.jpg"
                               }
                               alt={msg.sender.nama}
@@ -602,7 +603,7 @@ const Message = ({ initialTheme }: Props) => {
         open={open}
         onOpenChange={setOpen}
         title="Settings"
-        snapPoints={[30, 60, 80, 100]}
+        snapPoints={[100]}
         initialHeight={98}
       >
         <Setting

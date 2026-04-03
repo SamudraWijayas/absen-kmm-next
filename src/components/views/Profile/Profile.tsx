@@ -30,7 +30,8 @@ const Profile = () => {
   } = useProfile();
 
   const UpdateProfile = useDisclosure();
-
+  const [selectedFileType, setSelectedFileType] = useState<string>("image/png");
+  const [selectedFileName, setSelectedFileName] = useState<string>("avatar");
   const inputFileRef = useRef<HTMLInputElement | null>(null);
 
   const [imageSrc, setImageSrc] = useState<string | null>(null); // file preview
@@ -42,14 +43,47 @@ const Profile = () => {
     inputFileRef.current?.click();
   };
 
-  const onSelectNewAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onSelectNewAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    const file = files[0];
+    let file = files[0];
+
+    const isHeic =
+      file.type === "image/heic" ||
+      file.type === "image/heif" ||
+      file.name.toLowerCase().endsWith(".heic");
+
+    if (isHeic) {
+      try {
+        // ✅ import hanya di client saat dibutuhkan
+        const heic2any = (await import("heic2any")).default;
+
+        const convertedBlob = await heic2any({
+          blob: file,
+          toType: "image/jpeg",
+          quality: 0.9,
+        });
+
+        file = new File(
+          [convertedBlob as Blob],
+          file.name.replace(/\.heic$/i, ".jpg"),
+          {
+            type: "image/jpeg",
+          },
+        );
+      } catch (error) {
+        console.error("Gagal convert HEIC:", error);
+        return;
+      }
+    }
+
+    setSelectedFileType(file.type);
+    setSelectedFileName(file.name);
+
     const reader = new FileReader();
     reader.addEventListener("load", () => {
-      setImageSrc(reader.result as string); // tampilkan cropper
+      setImageSrc(reader.result as string);
     });
     reader.readAsDataURL(file);
   };
@@ -66,9 +100,11 @@ const Profile = () => {
 
     try {
       const blob = await getCroppedImg(imageSrc, croppedAreaPixels);
-      const file = new File([blob], "avatar.png", { type: "image/png" });
 
-      // Convert File to FileList
+      const file = new File([blob], selectedFileName, {
+        type: selectedFileType,
+      });
+
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
 
@@ -98,11 +134,8 @@ const Profile = () => {
           {/* Avatar */}
           <Image
             src={
-              preview
-                ? preview
-                : dataProfile?.foto
-                  ? `${process.env.NEXT_PUBLIC_IMAGE}${dataProfile.foto}`
-                  : "/profil.jpg"
+              (typeof preview === "string" ? preview : undefined) ||
+              (dataProfile?.foto ? `${dataProfile.foto}` : "/profil.jpg")
             }
             width={200}
             height={200}

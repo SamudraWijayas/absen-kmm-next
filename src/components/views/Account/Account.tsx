@@ -44,7 +44,7 @@ const Account = () => {
             <Image
               src={
                 dataProfile?.foto
-                  ? `${process.env.NEXT_PUBLIC_IMAGE}${dataProfile.foto}`
+                  ? `${dataProfile.foto}`
                   : "/profil.jpg"
               }
               width={200}

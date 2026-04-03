@@ -207,7 +207,7 @@ const BottomSheet = ({
           height: `${height}vh`,
           transform: open ? "translate3d(0,0,0)" : "translate3d(0,100%,0)",
         }}
-        className={`absolute bottom-0 left-0 w-full flex flex-col bg-white dark:bg-black rounded-t-2xl shadow-xl will-change-[height] transition-transform duration-300 ${
+        className={`absolute bottom-0 left-0 w-full flex flex-col bg-white dark:bg-[#212121] rounded-t-4xl shadow-xl will-change-[height] transition-transform duration-300 ${
           isDragging ? "transition-none" : ""
         } ${height === 100 ? "rounded-none" : ""}`}
       >

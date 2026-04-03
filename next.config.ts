@@ -19,8 +19,13 @@ const nextConfig: NextConfig = {
         hostname: "api.ppgbdl.com",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "storage.wahmoon.cloud",
+        pathname: "/uploads/**",
+      },
     ],
-   dangerouslyAllowLocalIP: true,
+    dangerouslyAllowLocalIP: true,
   },
 };
 
