@@ -135,6 +135,7 @@ const useProfile = () => {
           setValueUpdatePicture("foto", fileUrl);
         }
       },
+      "mumi",
     );
   };
 

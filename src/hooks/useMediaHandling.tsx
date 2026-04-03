@@ -8,10 +8,14 @@ const useMediaHandling = () => {
 
   const uploadFile = async (
     file: File,
-    callback: (fileUrl: string) => void
+    callback: (fileUrl: string) => void,
+    folder?: string,
   ) => {
     const formData = new FormData();
     formData.append("file", file);
+    if (folder) {
+      formData.append("folder", folder); // 🔥 INI KUNCI NYA
+    }
     const {
       data: {
         data: { url: fileUrl },
@@ -25,7 +29,8 @@ const useMediaHandling = () => {
       mutationFn: (variables: {
         file: File;
         callback: (fileUrl: string) => void;
-      }) => uploadFile(variables.file, variables.callback),
+        folder?: string;
+      }) => uploadFile(variables.file, variables.callback, variables.folder),
       onError: (error) => {
         setToaster({
           type: "error",
@@ -56,20 +61,22 @@ const useMediaHandling = () => {
   const handleUploadFile = (
     files: FileList,
     onChange: (value: string | FileList | null | undefined) => void,
-    callback: (fileUrl?: string) => void
+    callback: (fileUrl?: string) => void,
+    folder?: string,
   ) => {
     if (files.length !== 0) {
       onChange(files);
       mutateUploadFile({
         file: files[0],
         callback,
+        folder,
       });
     }
   };
 
   const handleDeleteFile = (
     fileUrl: string | FileList | null | undefined,
-    callback: () => void
+    callback: () => void,
   ) => {
     if (typeof fileUrl === "string") {
       mutateDeleteFile({ fileUrl, callback });
