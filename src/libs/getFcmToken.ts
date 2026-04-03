@@ -1,7 +1,8 @@
+// getFcmToken.ts
 import { getToken } from "firebase/messaging";
 import { messaging } from "./firebase";
 
-export const getFcmToken = async () => {
+export const getFcmToken = async (registration?: ServiceWorkerRegistration) => {
   try {
     if (!messaging) return null;
 
@@ -12,7 +13,9 @@ export const getFcmToken = async () => {
     }
 
     const token = await getToken(messaging, {
-      vapidKey: "BK1VZE8X2OePax7q4FXWeuecFQJ4LYBenhyWPnVrtLukD7M9p936_A0H6j3FBl4bH84_bFWf0ArOKyjZeM-iAWw",
+      vapidKey:
+        "BK1VZE8X2OePax7q4FXWeuecFQJ4LYBenhyWPnVrtLukD7M9p936_A0H6j3FBl4bH84_bFWf0ArOKyjZeM-iAWw",
+      serviceWorkerRegistration: registration, // ❗ tambahkan ini
     });
 
     console.log("FCM Token:", token);
