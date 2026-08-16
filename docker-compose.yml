@@ -6,8 +6,10 @@ services:
     container_name: m2bl-app
     restart: always
     ports:
-      - "3001:3000"
+      - "127.0.0.1:3001:3000"
     environment:
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
       - NEXT_PUBLIC_API_URL=https://api.ppgbdl.com/api
       - NEXT_PUBLIC_IMAGE=https://api.ppgbdl.com
       - NEXTAUTH_SECRET=I44s8c044eZOnOFYRgkpONfxgbEtu5iuObu0h4JzlmA=
@@ -17,16 +19,14 @@ services:
       test:
         [
           "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:3001",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3000', (r) => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))",
         ]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 3
-      start_period: 10s
+      start_period: 5s
     networks:
       - backend-network
 
