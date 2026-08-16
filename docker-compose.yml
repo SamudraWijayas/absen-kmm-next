@@ -6,7 +6,7 @@ services:
     container_name: m2bl-app
     restart: always
     ports:
-      - "3001:3000"
+      - "127.0.0.1:3001:3000"
     environment:
       - NEXT_PUBLIC_API_URL=https://api.ppgbdl.com/api
       - NEXT_PUBLIC_IMAGE=https://api.ppgbdl.com
@@ -19,9 +19,8 @@ services:
           "CMD",
           "wget",
           "--no-verbose",
-          "--tries=1",
           "--spider",
-          "http://localhost:3001",
+          "http://localhost:3000",
         ]
       interval: 30s
       timeout: 10s
